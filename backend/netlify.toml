@@ -1,0 +1,13 @@
+[build]
+  base = "backend"
+  command = "npm install"
+  functions = "functions"
+
+[functions]
+  external_node_modules = ["express", "serverless-http", "mongoose", "bcryptjs", "jsonwebtoken", "cors", "dotenv", "multer"]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
