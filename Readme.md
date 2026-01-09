@@ -79,3 +79,31 @@ Mobile-first
 Fast loading
 
 Trust-first product pages
+
+
+Phase 1: The Core Shopping Flow (Critical)
+These are essential for a user to actually buy something.
+
+Product Details Page (PDP)
+Why: When a user clicks a product on the Shop page, they need to go here.
+Features: Large hero image gallery, rich description (Health Benefits, Origin/Farm info), Ingredients list, "Add to Cart" sticky button, and Related Products.
+Cart / Shopping Bag
+Why: To review items.
+Style: Often a Side Drawer (Slide-over) is more premium than a separate page, allowing users to stay on the shop page.
+Checkout
+Why: To collect shipping and payment info.
+Style: A clean, distraction-free stepped process (Information > Shipping > Payment).
+Order Success / Thank You
+Why: Confirmation styling is often overlooked but important for reassurance.
+Phase 2: User Account & Engagement
+Login / Register: Branded authentication pages.
+User Dashboard:
+Order History: Status of current orders.
+Wishlist: For saved premium items (Saffron, etc.).
+Addresses: Saved shipping info.
+Contact / Support: A dedicated page for customer service or wholesale inquiries (since "Wholesale" is in your footer).
+Phase 3: Brand Storytelling (The "Premium" Touch)
+The Journal (Blog):
+Why: Organic brands rely on education. Articles like "Benefits of Kashmiri Saffron" or "Farm to Table Stories" build trust and SEO.
+Recipes Page: Showing how to use the products (e.g., "Saffron Milk Recipe").
+Sustainability / Our Farm: A visual-heavy page showing the actual fields, farmers, and organic certification process.

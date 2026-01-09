@@ -24,6 +24,15 @@ export default {
             },
             backgroundImage: {
                 'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+            },
+            keyframes: {
+                scroll: {
+                    'from': { transform: 'translateX(0)' },
+                    'to': { transform: 'translateX(-50%)' },
+                }
+            },
+            animation: {
+                scroll: 'scroll 20s linear infinite',
             }
         },
     },

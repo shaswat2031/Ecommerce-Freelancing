@@ -1,124 +1,216 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, X, ShoppingBag, Search } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
-import { gsap } from 'gsap';
+import { Link } from 'react-router-dom';
+import { ShoppingBag, Search, Menu, X, User, ArrowRight } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { useCart } from '../context/CartContext';
+import SaffronImg from '../assets/Saffron.png';
+import HingImg from '../assets/Hing.png';
 
 const Navbar = () => {
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
-    const location = useLocation();
+    const [isOpen, setIsOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredProducts, setFilteredProducts] = useState([]);
+    const searchInputRef = useRef(null);
+
+    const { getCartCount } = useCart();
+    const cartCount = getCartCount();
+
+    // Mock Product Data for Search
+    const allProducts = [
+        { id: 1, name: "Kashmiri Mongra Saffron", category: "Spices", price: "₹850", image: SaffronImg, link: "/shop" },
+        { id: 2, name: "Premium Asafoetida (Hing)", category: "Spices", price: "₹450", image: HingImg, link: "/shop" },
+        { id: 3, name: "Organic Walnuts", category: "Dry Fruits", price: "₹600", image: null, link: "/shop" },
+        { id: 4, name: "Turmeric Powder", category: "Spices", price: "₹180", image: null, link: "/shop" },
+    ];
 
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 60);
-        window.addEventListener('scroll', onScroll);
-        return () => window.removeEventListener('scroll', onScroll);
-    }, []);
-
-    const toggleMenu = () => {
-        setMenuOpen(!menuOpen);
-        if (!menuOpen) {
-            gsap.to('.mobile-menu', { x: '0%', duration: 0.7, ease: 'power4.out' });
-            gsap.fromTo(
-                '.mobile-link',
-                { y: 40, opacity: 0 },
-                { y: 0, opacity: 1, stagger: 0.12, duration: 0.6, delay: 0.2 }
-            );
-        } else {
-            gsap.to('.mobile-menu', { x: '100%', duration: 0.6, ease: 'power4.in' });
+        if (isSearchOpen && searchInputRef.current) {
+            searchInputRef.current.focus();
         }
+    }, [isSearchOpen]);
+
+    useEffect(() => {
+        if (searchQuery.trim() === '') {
+            setFilteredProducts([]);
+        } else {
+            const results = allProducts.filter(p =>
+                p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                p.category.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            setFilteredProducts(results);
+        }
+    }, [searchQuery]);
+
+    const handleCloseSearch = () => {
+        setIsSearchOpen(false);
+        setSearchQuery('');
     };
 
     return (
-        <>
-            {/* NAVBAR */}
-            <nav
-                className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled
-                    ? 'bg-[#0F3D2E] py-4 shadow-xl'
-                    : 'bg-transparent py-6 md:py-8'
-                    }`}
-            >
-                <div className="w-full max-w-[1600px] mx-auto px-6 md:px-12 lg:px-20 flex items-center justify-between">
+        <nav className="fixed w-full z-50 bg-background/80 backdrop-blur-md border-b border-secondary/20 transition-all duration-300">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+                <div className="flex justify-between items-center h-20">
 
-                    {/* LOGO */}
-                    <Link
-                        to="/"
-                        className="font-heading text-3xl md:text-4xl tracking-[0.35em] text-white"
-                    >
-                        SIRABA
-                        <span className="text-accent">.</span>
-                    </Link>
-
-                    {/* DESKTOP LINKS */}
-                    <div className="hidden md:flex items-center gap-16 lg:gap-24">
-                        {[
-                            { name: 'Shop', path: '/' },
-                            { name: 'Our Story', path: '/about' },
-                            { name: 'Traceability', path: '#' }
-                        ].map(link => (
-                            <Link
-                                key={link.name}
-                                to={link.path}
-                                className="relative font-body text-xs tracking-[0.3em] uppercase text-white/80 hover:text-white transition-colors"
-                            >
-                                {link.name}
-                                <span
-                                    className={`absolute -bottom-2 left-0 h-px bg-accent transition-all duration-300 ${location.pathname === link.path ? 'w-full' : 'w-0 group-hover:w-full'
-                                        }`}
-                                />
-                            </Link>
-                        ))}
-                    </div>
-
-                    {/* ACTIONS */}
-                    <div className="flex items-center gap-8 text-white">
-                        <button className="hidden md:block hover:text-accent transition">
-                            <Search size={22} strokeWidth={1.5} />
-                        </button>
-
-                        <button className="relative hover:text-accent transition">
-                            <ShoppingBag size={22} strokeWidth={1.5} />
-                            <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-accent" />
-                        </button>
-
+                    {/* Mobile Menu Button */}
+                    <div className="flex items-center md:hidden">
                         <button
-                            className="md:hidden hover:text-accent transition"
-                            onClick={toggleMenu}
+                            onClick={() => setIsOpen(!isOpen)}
+                            className="text-primary hover:text-accent transition-colors"
                         >
-                            <Menu size={26} strokeWidth={1.5} />
+                            <span className="sr-only">Open menu</span>
+                            {isOpen ? <X size={24} /> : <Menu size={24} />}
                         </button>
                     </div>
+
+                    {/* Logo (Hidden on mobile if search is open? No, keep it) */}
+                    <div className={`flex-shrink-0 flex items-center justify-center flex-1 md:flex-none md:justify-start ${isSearchOpen ? 'hidden md:flex' : 'flex'}`}>
+                        <Link to="/" className="flex flex-col items-center md:items-start group">
+                            <span className="font-heading text-2xl md:text-3xl font-bold text-primary tracking-wide group-hover:text-accent transition-colors duration-300">
+                                SIRABA
+                            </span>
+                            <span className="text-[0.65rem] md:text-xs uppercase tracking-[0.2em] text-secondary font-medium group-hover:text-primary transition-colors duration-300">
+                                Organic
+                            </span>
+                        </Link>
+                    </div>
+
+                    {/* Desktop Navigation / Search Bar Transition */}
+                    <div className="flex-1 flex items-center justify-end md:justify-center px-4 md:px-8">
+                        {!isSearchOpen ? (
+                            /* Standard Nav Links */
+                            <div className="hidden md:flex items-center space-x-8 lg:space-x-12 animate-fade-in">
+                                {['Shop', 'About Us', 'Certification', 'B2B', 'Contact Us'].map((item) => (
+                                    <Link
+                                        key={item}
+                                        to={`/${item.toLowerCase().replace(/ & /g, '-').replace(' ', '-')}`}
+                                        className="text-text-primary hover:text-accent font-body text-sm uppercase tracking-widest transition-all duration-300 hover:-translate-y-0.5"
+                                    >
+                                        {item}
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            /* Apple-style Inline Search Bar */
+                            <div className="flex flex-1 max-w-2xl relative animate-fade-in w-full">
+                                <Search className="absolute left-0 top-1/2 -translate-y-1/2 text-primary/50" size={20} strokeWidth={1.5} />
+                                <input
+                                    ref={searchInputRef}
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Search details..."
+                                    className="w-full bg-transparent border-none text-primary placeholder-primary/40 text-lg pl-10 pr-12 py-2 focus:ring-0 font-light outline-none"
+                                />
+                                <button onClick={handleCloseSearch} className="absolute right-0 top-1/2 -translate-y-1/2 text-primary/50 text-xs uppercase tracking-wider font-bold hover:text-primary transition-colors">
+                                    Close
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Icons Section */}
+                    <div className="flex items-center space-x-4 md:space-x-6">
+                        {/* Toggle Search visibility if closed */}
+                        {!isSearchOpen && (
+                            <button
+                                onClick={() => setIsSearchOpen(true)}
+                                className="group flex items-center justify-center w-10 h-10 rounded-full hover:bg-secondary/10 transition-all duration-300"
+                                aria-label="Search"
+                            >
+                                <Search size={22} strokeWidth={1.5} className="text-primary group-hover:text-accent transition-colors" />
+                            </button>
+                        )}
+
+                        <Link to="/account" className={`hidden md:flex items-center justify-center w-10 h-10 rounded-full hover:bg-secondary/10 transition-all duration-300 ${isSearchOpen ? 'hidden lg:flex' : ''}`}>
+                            <User size={22} strokeWidth={1.5} className="text-primary hover:text-accent transition-colors" />
+                        </Link>
+                        <Link to="/cart" className={`relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-secondary/10 transition-all duration-300 group ${isSearchOpen ? 'hidden lg:flex' : ''}`}>
+                            <ShoppingBag size={22} strokeWidth={1.5} className="text-primary group-hover:text-accent transition-colors" />
+                            {cartCount > 0 && (
+                                <span className="absolute -top-1 -right-1 h-5 w-5 bg-accent text-primary text-[10px] font-bold flex items-center justify-center rounded-full shadow-sm">
+                                    {cartCount}
+                                </span>
+                            )}
+                        </Link>
+                    </div>
                 </div>
-            </nav>
 
-            {/* MOBILE MENU */}
-            <div className="mobile-menu fixed inset-0 z-[60] bg-primary translate-x-full flex flex-col items-center justify-center text-white">
-                <button
-                    onClick={toggleMenu}
-                    className="absolute top-8 right-8 text-white/60 hover:text-white"
-                >
-                    <X size={32} strokeWidth={1} />
-                </button>
+                {/* Search Results Dropdown (Amazon/Apple Style Dropdown) */}
+                {isSearchOpen && searchQuery && (
+                    <div className="absolute top-[90%] left-1/2 transform -translate-x-1/2 w-full max-w-2xl bg-white shadow-xl rounded-b-md border border-secondary/10 overflow-hidden animate-slide-up origin-top z-50">
+                        <div className="max-h-[60vh] overflow-y-auto">
+                            {filteredProducts.length > 0 ? (
+                                <div>
+                                    <div className="bg-gray-50 px-4 py-2 text-xs uppercase tracking-widest text-text-secondary font-semibold border-b border-gray-100">
+                                        Products
+                                    </div>
+                                    {filteredProducts.map(product => (
+                                        <Link
+                                            key={product.id}
+                                            to={product.link}
+                                            onClick={handleCloseSearch}
+                                            className="flex items-center p-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-none group"
+                                        >
+                                            <div className="w-10 h-10 bg-white border border-gray-100 rounded-sm flex-shrink-0 flex items-center justify-center p-1 mr-4">
+                                                <img src={product.image || SaffronImg} alt={product.name} className="w-full h-full object-contain" />
+                                            </div>
+                                            <div className="flex-grow">
+                                                <p className="text-sm font-medium text-primary group-hover:text-accent transition-colors">{product.name}</p>
+                                                <p className="text-xs text-text-secondary">{product.category}</p>
+                                            </div>
+                                            <span className="text-sm font-bold text-primary">{product.price}</span>
+                                        </Link>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="p-8 text-center text-text-secondary">
+                                    No results found.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+            </div>
 
-                <div className="absolute top-8 left-8 font-heading tracking-[0.4em] text-white/20">
-                    SIRABA
+            {/* Backdrop for Desktop Focus */}
+            {isSearchOpen && (
+                <div className="hidden md:block fixed inset-0 top-20 bg-black/20 backdrop-blur-[2px] -z-10 animate-fade-in" onClick={handleCloseSearch}></div>
+            )}
+
+            {/* Mobile Menu */}
+            <div className={`md:hidden absolute top-full left-0 w-full bg-background border-b border-secondary/20 transition-all duration-300 ease-in-out transform ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
+                {/* Mobile Search Input */}
+                <div className="p-4 border-b border-secondary/10">
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="w-full bg-secondary/5 border border-secondary/20 rounded-md py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-accent"
+                        />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" size={16} />
+                    </div>
                 </div>
-
-                <Link to="/" onClick={toggleMenu} className="mobile-link font-heading text-5xl hover:text-accent transition hover:italic">
-                    Shop
-                </Link>
-                <Link to="/about" onClick={toggleMenu} className="mobile-link font-heading text-5xl hover:text-accent transition hover:italic">
-                    Our Story
-                </Link>
-                <a href="#" onClick={toggleMenu} className="mobile-link font-heading text-5xl hover:text-accent transition hover:italic">
-                    Traceability
-                </a>
-
-                <div className="mobile-link mt-14 flex gap-10 text-xs tracking-[0.3em] text-white/50">
-                    <span>INSTAGRAM</span>
-                    <span>SUPPORT</span>
+                <div className="px-4 pt-2 pb-6 space-y-2">
+                    {['Shop', 'About Us', 'Certification', 'B2B', 'Contact Us'].map((item) => (
+                        <Link
+                            key={item}
+                            to={`/${item.toLowerCase().replace(/ & /g, '-').replace(' ', '-')}`}
+                            className="block px-3 py-3 text-base font-medium text-primary hover:bg-secondary/10 hover:text-accent rounded-md transition-colors"
+                            onClick={() => setIsOpen(false)}
+                        >
+                            {item}
+                        </Link>
+                    ))}
+                    <Link
+                        to="/account"
+                        className="block px-3 py-3 text-base font-medium text-primary hover:bg-secondary/10 hover:text-accent rounded-md transition-colors border-t border-secondary/10 mt-2"
+                        onClick={() => setIsOpen(false)}
+                    >
+                        My Account
+                    </Link>
                 </div>
             </div>
-        </>
+        </nav>
     );
 };
 
