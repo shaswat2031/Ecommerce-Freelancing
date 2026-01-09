@@ -154,7 +154,7 @@ const Cart = () => {
                     {/* Cart Items List */}
                     <div className="lg:col-span-2 space-y-6">
                         {cartItems.map((item) => (
-                            <div key={item.id} className="bg-surface p-6 rounded-sm shadow-sm border border-secondary/10 flex gap-6 items-center">
+                            <div key={item._id || item.id} className="bg-surface p-6 rounded-sm shadow-sm border border-secondary/10 flex gap-6 items-center">
                                 {/* Product Image */}
                                 <div className="w-24 h-24 bg-background p-2 rounded-sm flex-shrink-0 border border-secondary/5">
                                     <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
@@ -167,7 +167,7 @@ const Cart = () => {
                                             {item.name}
                                         </Link>
                                         <button
-                                            onClick={() => removeFromCart(item.id)}
+                                            onClick={() => removeFromCart(item._id || item.id)}
                                             className="text-text-secondary hover:text-red-500 transition-colors p-1"
                                             title="Remove Item"
                                         >
@@ -180,7 +180,7 @@ const Cart = () => {
                                         {/* Quantity Controls */}
                                         <div className="flex items-center border border-secondary/20 rounded-sm bg-background">
                                             <button
-                                                onClick={() => updateQuantity(item.id, -1)}
+                                                onClick={() => updateQuantity(item._id || item.id, -1)}
                                                 className="p-2 hover:bg-secondary/10 transition-colors text-primary"
                                                 disabled={item.quantity <= 1}
                                             >
@@ -188,7 +188,7 @@ const Cart = () => {
                                             </button>
                                             <span className="w-10 text-center font-medium text-sm text-primary">{item.quantity}</span>
                                             <button
-                                                onClick={() => updateQuantity(item.id, 1)}
+                                                onClick={() => updateQuantity(item._id || item.id, 1)}
                                                 className="p-2 hover:bg-secondary/10 transition-colors text-primary"
                                             >
                                                 <Plus size={16} />
