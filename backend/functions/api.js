@@ -37,6 +37,14 @@ router.get('/', (req, res) => {
     res.send('API is running...');
 });
 
+router.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'UP',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
+});
+
 router.use('/auth', authRoutes);
 router.use('/products', productRoutes);
 router.use('/orders', orderRoutes);
