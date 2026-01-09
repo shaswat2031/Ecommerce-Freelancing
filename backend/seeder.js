@@ -23,50 +23,17 @@ const importData = async () => {
         const salt = await bcrypt.genSalt(10);
         const hash = async (pwd) => await bcrypt.hash(pwd, salt);
 
+        // We MUST create an admin user to be able to access the system
         const adminUser = await User.create({
             name: 'Admin User',
-            email: 'admin@example.com', // Already lower but good to be explicit
+            email: 'admin@example.com',
             password: await hash('admin123'),
             isAdmin: true
         });
         console.log(`Created Admin: ${adminUser.email}`);
 
-        const normalUser = await User.create({
-            name: 'John Doe',
-            email: 'user@example.com',
-            password: await hash('user123'),
-            isAdmin: false
-        });
-        console.log(`Created User: ${normalUser.email}`);
-
-        // Create Coupons
-        await Coupon.create([
-            {
-                code: 'WELCOME10',
-                discountType: 'percentage',
-                discountValue: 10,
-                isActive: true,
-                assignedTo: null, // General
-                description: '10% off for everyone'
-            },
-            {
-                code: 'SAVE500',
-                discountType: 'fixed',
-                discountValue: 500,
-                isActive: true,
-                assignedTo: null,
-                description: 'Flat ₹500 off'
-            },
-            {
-                code: 'USERONLY',
-                discountType: 'percentage',
-                discountValue: 20,
-                isActive: true,
-                assignedTo: normalUser._id, // Specific to normal user
-                description: '20% off for John Doe'
-            }
-        ]);
-        console.log('Coupons Imported!');
+        // Mock Normal User REMOVED as requested
+        // Mock Coupons REMOVED as requested
 
         console.log('Users Imported!');
 

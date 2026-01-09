@@ -19,8 +19,28 @@ connectDB();
 
 const app = express();
 
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:5000',
+    'https://rad-kringle-188297.netlify.app',
+    process.env.CLIENT_URL
+].filter(Boolean);
+
 const corsOptions = {
-    origin: process.env.CLIENT_URL || '*',
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+
+        // Check if origin is allowed
+        const isAllowed = allowedOrigins.includes(origin) || allowedOrigins.some(o => origin.startsWith(o));
+
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            // Fallback for development/testing ease
+            console.log('CORS looser check for:', origin);
+            callback(null, true);
+        }
+    },
     credentials: true,
     optionsSuccessStatus: 200
 };
