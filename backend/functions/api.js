@@ -14,9 +14,6 @@ const couponRoutes = require('../routes/couponRoutes');
 
 dotenv.config();
 
-// Connect to database
-connectDB();
-
 const app = express();
 
 const allowedOrigins = [
@@ -48,6 +45,20 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// Middleware to ensure DB connection before each request
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (error) {
+        console.error('Database connection failed:', error);
+        res.status(503).json({
+            message: 'Database connection failed. Please try again later.',
+            error: error.message
+        });
+    }
+});
+
 // Routes
 // IMPORTANT: Netlify functions are served under /.netlify/functions/api
 // We need the router to understand this prefix OR use a router that handles relative paths.
@@ -61,7 +72,8 @@ router.get('/health', (req, res) => {
     res.status(200).json({
         status: 'UP',
         timestamp: new Date().toISOString(),
-        uptime: process.uptime()
+        uptime: process.uptime(),
+        database: require('mongoose').connection.readyState === 1 ? 'connected' : 'disconnected'
     });
 });
 
