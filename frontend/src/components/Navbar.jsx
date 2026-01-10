@@ -1,27 +1,53 @@
-import { Link } from 'react-router-dom';
-import { ShoppingBag, Search, Menu, X, User, ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ShoppingBag, Search, Menu, X, User } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import { useCurrency } from '../context/CurrencyContext';
 import { useCart } from '../context/CartContext';
-import SaffronImg from '../assets/Saffron.png';
-import HingImg from '../assets/Hing.png';
+import logo from '../assets/SIRABALOGO.png';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [filteredProducts, setFilteredProducts] = useState([]);
     const searchInputRef = useRef(null);
+    const currencyRef = useRef(null);
+    const navigate = useNavigate();
 
+    const { currency, setCurrency, availableCurrencies } = useCurrency();
     const { getCartCount } = useCart();
     const cartCount = getCartCount();
 
-    // Mock Product Data for Search
-    const allProducts = [
-        { id: 1, name: "Kashmiri Mongra Saffron", category: "Spices", price: "₹850", image: SaffronImg, link: "/shop" },
-        { id: 2, name: "Premium Asafoetida (Hing)", category: "Spices", price: "₹450", image: HingImg, link: "/shop" },
-        { id: 3, name: "Organic Walnuts", category: "Dry Fruits", price: "₹600", image: null, link: "/shop" },
-        { id: 4, name: "Turmeric Powder", category: "Spices", price: "₹180", image: null, link: "/shop" },
-    ];
+    // Currency symbols mapping - 27 major world currencies
+    const currencySymbols = {
+        INR: '₹',   // Indian Rupee
+        USD: '$',   // US Dollar
+        EUR: '€',   // Euro
+        GBP: '£',   // British Pound
+        JPY: '¥',   // Japanese Yen
+        CNY: '¥',   // Chinese Yuan
+        AUD: 'A$',  // Australian Dollar
+        CAD: 'C$',  // Canadian Dollar
+        CHF: 'CHF', // Swiss Franc
+        SGD: 'S$',  // Singapore Dollar
+        AED: 'د.إ', // UAE Dirham
+        SAR: '﷼',   // Saudi Riyal
+        KRW: '₩',   // South Korean Won
+        HKD: 'HK$', // Hong Kong Dollar
+        NZD: 'NZ$', // New Zealand Dollar
+        SEK: 'kr',  // Swedish Krona
+        NOK: 'kr',  // Norwegian Krone
+        DKK: 'kr',  // Danish Krone
+        ZAR: 'R',   // South African Rand
+        BRL: 'R$',  // Brazilian Real
+        MXN: '$',   // Mexican Peso
+        RUB: '₽',   // Russian Ruble
+        THB: '฿',   // Thai Baht
+        MYR: 'RM',  // Malaysian Ringgit
+        IDR: 'Rp',  // Indonesian Rupiah
+        TWD: 'NT$', // Taiwan Dollar
+        PLN: 'zł'   // Polish Złoty
+    };
 
     useEffect(() => {
         if (isSearchOpen && searchInputRef.current) {
@@ -29,21 +55,40 @@ const Navbar = () => {
         }
     }, [isSearchOpen]);
 
+    // Close currency dropdown when clicking outside
     useEffect(() => {
-        if (searchQuery.trim() === '') {
-            setFilteredProducts([]);
-        } else {
-            const results = allProducts.filter(p =>
-                p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                p.category.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setFilteredProducts(results);
+        const handleClickOutside = (event) => {
+            if (currencyRef.current && !currencyRef.current.contains(event.target)) {
+                setIsCurrencyOpen(false);
+            }
+        };
+
+        if (isCurrencyOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
         }
-    }, [searchQuery]);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isCurrencyOpen]);
 
     const handleCloseSearch = () => {
         setIsSearchOpen(false);
         setSearchQuery('');
+    };
+
+    const handleSearchSubmit = (e) => {
+        if (e.key === 'Enter' && searchQuery.trim()) {
+            navigate(`/shop?keyword=${encodeURIComponent(searchQuery.trim())}`);
+            handleCloseSearch();
+        }
+    };
+
+    const handleMobileSearchSubmit = (e) => {
+        if (e.key === 'Enter' && e.target.value.trim()) {
+            navigate(`/shop?keyword=${encodeURIComponent(e.target.value.trim())}`);
+            setIsOpen(false);
+        }
     };
 
     return (
@@ -62,15 +107,18 @@ const Navbar = () => {
                         </button>
                     </div>
 
-                    {/* Logo (Hidden on mobile if search is open? No, keep it) */}
+                    {/* Logo */}
                     <div className={`flex-shrink-0 flex items-center justify-center flex-1 md:flex-none md:justify-start ${isSearchOpen ? 'hidden md:flex' : 'flex'}`}>
-                        <Link to="/" className="flex flex-col items-center md:items-start group">
-                            <span className="font-heading text-2xl md:text-3xl font-bold text-primary tracking-wide group-hover:text-accent transition-colors duration-300">
-                                SIRABA
-                            </span>
-                            <span className="text-[0.65rem] md:text-xs uppercase tracking-[0.2em] text-secondary font-medium group-hover:text-primary transition-colors duration-300">
-                                Organic
-                            </span>
+                        <Link to="/" className="flex items-center gap-2 md:gap-3 group">
+                            <img src={logo} alt="Siraba Organic Logo" className="h-10 w-auto md:h-12 object-contain" />
+                            <div className="flex flex-col items-start">
+                                <span className="font-heading text-xl md:text-2xl font-bold text-primary tracking-wide group-hover:text-accent transition-colors duration-300 leading-none">
+                                    SIRABA
+                                </span>
+                                <span className="text-[0.55rem] md:text-[0.65rem] uppercase tracking-[0.2em] text-secondary font-medium group-hover:text-primary transition-colors duration-300 leading-tight">
+                                    Organic
+                                </span>
+                            </div>
                         </Link>
                     </div>
 
@@ -90,7 +138,7 @@ const Navbar = () => {
                                 ))}
                             </div>
                         ) : (
-                            /* Apple-style Inline Search Bar */
+                            /* Search Bar */
                             <div className="flex flex-1 max-w-2xl relative animate-fade-in w-full">
                                 <Search className="absolute left-0 top-1/2 -translate-y-1/2 text-primary/50" size={20} strokeWidth={1.5} />
                                 <input
@@ -98,6 +146,7 @@ const Navbar = () => {
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={handleSearchSubmit}
                                     placeholder="Search details..."
                                     className="w-full bg-transparent border-none text-primary placeholder-primary/40 text-lg pl-10 pr-12 py-2 focus:ring-0 font-light outline-none"
                                 />
@@ -110,6 +159,40 @@ const Navbar = () => {
 
                     {/* Icons Section */}
                     <div className="flex items-center space-x-4 md:space-x-6">
+                        {/* Currency Selector - Desktop */}
+                        <div ref={currencyRef} className="hidden md:block relative">
+                            <button
+                                onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
+                                className="flex items-center gap-2 px-3 py-2 rounded-md bg-secondary/5 hover:bg-secondary/10 border border-secondary/10 hover:border-accent/30 text-sm font-bold text-primary hover:text-accent transition-all duration-200"
+                            >
+                                <span className="text-base">{currencySymbols[currency] || currency}</span>
+                                <span className="text-xs">{currency}</span>
+                                <span className={`text-[10px] transition-transform duration-200 ${isCurrencyOpen ? 'rotate-180' : ''}`}>▼</span>
+                            </button>
+                            {isCurrencyOpen && (
+                                <div className="absolute top-full right-0 mt-2 w-40 bg-surface border border-secondary/20 shadow-xl rounded-md py-2 z-50 animate-fade-in max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-primary/30 scrollbar-track-transparent hover:scrollbar-thumb-primary/50">
+                                    {availableCurrencies.map(curr => (
+                                        <button
+                                            key={curr}
+                                            onClick={() => {
+                                                setCurrency(curr);
+                                                setIsCurrencyOpen(false);
+                                            }}
+                                            className={`flex items-center justify-between w-full px-4 py-2.5 text-sm font-bold hover:bg-accent/10 transition-colors ${currency === curr
+                                                ? 'text-accent bg-accent/5'
+                                                : 'text-primary'
+                                                }`}
+                                        >
+                                            <span className="flex items-center gap-2">
+                                                <span className="text-lg">{currencySymbols[curr] || curr}</span>
+                                                <span>{curr}</span>
+                                            </span>
+                                            {currency === curr && <span className="text-accent">✓</span>}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                         {/* Toggle Search visibility if closed */}
                         {!isSearchOpen && (
                             <button
@@ -134,42 +217,6 @@ const Navbar = () => {
                         </Link>
                     </div>
                 </div>
-
-                {/* Search Results Dropdown (Amazon/Apple Style Dropdown) */}
-                {isSearchOpen && searchQuery && (
-                    <div className="absolute top-[90%] left-1/2 transform -translate-x-1/2 w-full max-w-2xl bg-white shadow-xl rounded-b-md border border-secondary/10 overflow-hidden animate-slide-up origin-top z-50">
-                        <div className="max-h-[60vh] overflow-y-auto">
-                            {filteredProducts.length > 0 ? (
-                                <div>
-                                    <div className="bg-gray-50 px-4 py-2 text-xs uppercase tracking-widest text-text-secondary font-semibold border-b border-gray-100">
-                                        Products
-                                    </div>
-                                    {filteredProducts.map(product => (
-                                        <Link
-                                            key={product.id}
-                                            to={product.link}
-                                            onClick={handleCloseSearch}
-                                            className="flex items-center p-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-none group"
-                                        >
-                                            <div className="w-10 h-10 bg-white border border-gray-100 rounded-sm flex-shrink-0 flex items-center justify-center p-1 mr-4">
-                                                <img src={product.image || SaffronImg} alt={product.name} className="w-full h-full object-contain" />
-                                            </div>
-                                            <div className="flex-grow">
-                                                <p className="text-sm font-medium text-primary group-hover:text-accent transition-colors">{product.name}</p>
-                                                <p className="text-xs text-text-secondary">{product.category}</p>
-                                            </div>
-                                            <span className="text-sm font-bold text-primary">{product.price}</span>
-                                        </Link>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="p-8 text-center text-text-secondary">
-                                    No results found.
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
             </div>
 
             {/* Backdrop for Desktop Focus */}
@@ -185,9 +232,25 @@ const Navbar = () => {
                         <input
                             type="text"
                             placeholder="Search..."
+                            onKeyDown={handleMobileSearchSubmit}
                             className="w-full bg-secondary/5 border border-secondary/20 rounded-md py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-accent"
                         />
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" size={16} />
+                    </div>
+                    <div className="border-t border-secondary/10 mt-2 pt-2">
+                        <p className="px-3 text-xs font-bold text-text-secondary uppercase mb-1">Currency</p>
+                        <div className="flex flex-wrap gap-2 px-3">
+                            {availableCurrencies.map(curr => (
+                                <button
+                                    key={curr}
+                                    onClick={() => { setCurrency(curr); setIsOpen(false); }}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold border transition-all ${currency === curr ? 'bg-accent text-primary border-accent shadow-sm' : 'bg-transparent text-text-secondary border-secondary/20 hover:border-accent/50'}`}
+                                >
+                                    <span className="text-sm">{currencySymbols[curr]}</span>
+                                    <span>{curr}</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
                 <div className="px-4 pt-2 pb-6 space-y-2">
