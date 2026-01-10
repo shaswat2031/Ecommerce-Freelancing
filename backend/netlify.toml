@@ -4,7 +4,21 @@
   functions = "functions"
 
 [functions]
-  external_node_modules = ["express", "serverless-http", "mongoose", "bcryptjs", "jsonwebtoken", "cors", "dotenv", "multer"]
+  external_node_modules = [
+    "express", 
+    "serverless-http", 
+    "mongoose", 
+    "bcryptjs", 
+    "jsonwebtoken", 
+    "cors", 
+    "dotenv", 
+    "multer",
+    "multer-gridfs-storage",
+    "socket.io",
+    "socket.io-client",
+    "nodemailer",
+    "express-async-handler"
+  ]
   node_bundler = "esbuild"
 
 [[redirects]]

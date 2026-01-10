@@ -11,6 +11,8 @@ const cartRoutes = require('../routes/cartRoutes');
 const uploadRoutes = require('../routes/uploadRoutes');
 const inquiryRoutes = require('../routes/inquiryRoutes');
 const couponRoutes = require('../routes/couponRoutes');
+const b2bRoutes = require('../routes/b2bRoutes');
+const contactRoutes = require('../routes/contactRoutes');
 
 dotenv.config();
 
@@ -84,6 +86,8 @@ router.use('/cart', cartRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/inquiries', inquiryRoutes);
 router.use('/coupons', couponRoutes);
+router.use('/b2b', b2bRoutes);
+router.use('/contact', contactRoutes);
 
 // Mount the router at the path used by Netlify Functions
 app.use('/.netlify/functions/api', router);
