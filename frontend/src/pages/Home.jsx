@@ -93,9 +93,9 @@ const Home = () => {
                             <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center text-primary mb-2">
                                 <Globe size={32} strokeWidth={1} />
                             </div>
-                            <h3 className="font-heading text-xl text-primary font-bold">Farm to Global</h3>
+                            <h3 className="font-heading text-xl text-primary font-bold">Direct Farm to Home</h3>
                             <p className="text-text-secondary text-sm leading-relaxed max-w-xs font-light">
-                                Ethically sourced directly from farmers, delivered to connoisseurs worldwide.
+                                Fresh from Kashmir's heritage farms delivered securely to your doorstep.
                             </p>
                         </div>
                     </div>
@@ -132,6 +132,75 @@ const Home = () => {
                                 </div>
                             </Link>
                         ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Customer Reviews */}
+            <section className="py-20 bg-background border-t border-secondary/10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-12">
+                        <span className="text-accent text-sm tracking-[0.2em] uppercase font-bold">Testimonials</span>
+                        <h2 className="font-heading text-3xl md:text-4xl text-primary mt-2">Loved by Our Customers</h2>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="bg-white p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow duration-300 space-y-6">
+                            <div className="flex text-accent gap-1">
+                                <Star size={16} fill="currentColor" />
+                                <Star size={16} fill="currentColor" />
+                                <Star size={16} fill="currentColor" />
+                                <Star size={16} fill="currentColor" />
+                                <Star size={16} fill="currentColor" />
+                            </div>
+                            <p className="text-text-secondary text-base italic leading-relaxed">
+                                "The aroma is incredible. Just a few strands are enough for my Biryani. The quality is visibly superior to what I find in supermarkets."
+                            </p>
+                            <div className="flex items-center gap-3 pt-4 border-t border-secondary/10">
+                                <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center text-primary font-bold text-xs">PS</div>
+                                <div>
+                                    <p className="font-heading font-bold text-primary text-sm">Priya Sharma</p>
+                                    <p className="text-xs text-text-secondary">Verified Buyer</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow duration-300 space-y-6">
+                            <div className="flex text-accent gap-1">
+                                <Star size={16} fill="currentColor" />
+                                <Star size={16} fill="currentColor" />
+                                <Star size={16} fill="currentColor" />
+                                <Star size={16} fill="currentColor" />
+                                <Star size={16} fill="currentColor" />
+                            </div>
+                            <p className="text-text-secondary text-base italic leading-relaxed">
+                                "I use this for my daily saffron tea. The color release is instant and beautiful golden. Absolutely worth the price for this purity."
+                            </p>
+                            <div className="flex items-center gap-3 pt-4 border-t border-secondary/10">
+                                <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center text-primary font-bold text-xs">RM</div>
+                                <div>
+                                    <p className="font-heading font-bold text-primary text-sm">Rahul Mehta</p>
+                                    <p className="text-xs text-text-secondary">Verified Buyer</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow duration-300 space-y-6">
+                            <div className="flex text-accent gap-1">
+                                <Star size={16} fill="currentColor" />
+                                <Star size={16} fill="currentColor" />
+                                <Star size={16} fill="currentColor" />
+                                <Star size={16} fill="currentColor" />
+                                <Star size={16} fill="currentColor" />
+                            </div>
+                            <p className="text-text-secondary text-base italic leading-relaxed">
+                                "Fast delivery and beautiful premium packaging. It feels like a luxury gift. I ordered for my mother and she loved it."
+                            </p>
+                            <div className="flex items-center gap-3 pt-4 border-t border-secondary/10">
+                                <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center text-primary font-bold text-xs">SJ</div>
+                                <div>
+                                    <p className="font-heading font-bold text-primary text-sm">Sarah Jenkins</p>
+                                    <p className="text-xs text-text-secondary">Verified Buyer</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

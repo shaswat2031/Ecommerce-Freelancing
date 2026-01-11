@@ -5,7 +5,7 @@ import { useOrders } from '../../context/OrderContext';
 import { useSocket } from '../../context/SocketContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { Navigate } from 'react-router-dom';
-import { Users, ShoppingBag, Package, Settings, LogOut, Check, X, Plus, Edit2, Trash2, Eye, FileText, TicketPercent, ChevronDown, ChevronUp, Clock, CheckCircle, Truck, PackageCheck, Menu, LineChart as ChartIcon, Mail, Download } from 'lucide-react';
+import { Users, ShoppingBag, Package, Settings, LogOut, Check, X, Plus, Edit2, Trash2, Eye, FileText, TicketPercent, ChevronDown, ChevronUp, Clock, CheckCircle, Truck, PackageCheck, Menu, LineChart as ChartIcon, Mail, Download, TrendingUp, AlertCircle } from 'lucide-react';
 import client from '../../api/client';
 import Logo from '../../assets/SIRABALOGO.png';
 import { downloadInvoice, previewInvoice } from '../../utils/invoiceUtils';
@@ -681,7 +681,7 @@ const AdminDashboard = () => {
             <div className="bg-surface p-6 rounded-sm shadow-sm border border-secondary/10 flex items-center justify-between">
                 <div>
                     <p className="text-text-secondary text-sm font-medium uppercase tracking-wider">Active Orders</p>
-                    <h3 className="text-3xl font-bold text-primary mt-1">{orders.filter(o => o.status !== 'Shipped').length}</h3>
+                    <h3 className="text-3xl font-bold text-primary mt-1">{orders.filter(o => !['Delivered', 'Shipped', 'Cancelled', 'Closed'].includes(o.status)).length}</h3>
                 </div>
                 <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
                     <Package size={24} />
@@ -703,9 +703,10 @@ const AdminDashboard = () => {
     const getOrderStatusInfo = (status) => {
         const statusMap = {
             'Pending': { color: 'yellow', icon: Clock, step: 1, label: 'Order Placed' },
-            'Approved': { color: 'blue', icon: CheckCircle, step: 2, label: 'Confirmed' },
+            'Approved': { color: 'blue', icon: Check, step: 2, label: 'Confirmed' },
             'Packed': { color: 'purple', icon: PackageCheck, step: 3, label: 'Packed' },
-            'Shipped': { color: 'indigo', icon: Truck, step: 4, label: 'Shipped' }
+            'Shipped': { color: 'indigo', icon: Truck, step: 4, label: 'Shipped' },
+            'Delivered': { color: 'green', icon: CheckCircle, step: 5, label: 'Delivered' }
         };
         return statusMap[status] || statusMap['Pending'];
     };
@@ -824,6 +825,8 @@ const AdminDashboard = () => {
                                                             <option value="Approved">Confirmed</option>
                                                             <option value="Packed">Packed</option>
                                                             <option value="Shipped">Shipped</option>
+                                                            <option value="Delivered">Delivered</option>
+                                                            <option value="Cancelled">Cancelled</option>
                                                         </select>
                                                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-secondary">
                                                             <ChevronDown size={12} />
@@ -864,7 +867,7 @@ const AdminDashboard = () => {
                                                                 </div>
 
                                                                 {/* Steps */}
-                                                                {['Pending', 'Approved', 'Packed', 'Shipped'].map((status, idx) => {
+                                                                {['Pending', 'Approved', 'Packed', 'Shipped', 'Delivered'].map((status, idx) => {
                                                                     const stepInfo = getOrderStatusInfo(status);
                                                                     const isComplete = statusInfo.step > idx + 1;
                                                                     const isCurrent = statusInfo.step === idx + 1;
@@ -1902,248 +1905,194 @@ const AdminDashboard = () => {
         };
 
         return (
-            <div className="space-y-8 animate-fade-in">
-                {/* Business Overview Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="bg-surface p-6 rounded-sm shadow-sm border border-secondary/10">
-                        <p className="text-xs uppercase tracking-wider text-text-secondary mb-1">Total Revenue</p>
-                        <p className="text-2xl font-bold text-primary">{formatPrice(analyticsData.totalRevenue)}</p>
-                        <p className="text-xs text-green-600 mt-2">↑ All time</p>
+            <div className="space-y-6 animate-fade-in pb-12">
+                {/* Header Row */}
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-bold text-primary">Performance Overview</h2>
+                    <button onClick={downloadCSV} className="text-sm border border-secondary/20 hover:bg-secondary/5 px-4 py-2 rounded-sm flex items-center gap-2 transition-colors text-primary">
+                        <Download size={16} /> Export Report
+                    </button>
+                </div>
+
+                {/* Key Metrics Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-surface p-6 rounded-sm border border-secondary/10">
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-text-secondary">Total Revenue</h3>
+                            <div className="bg-green-50 text-green-700 p-1.5 rounded-sm"><TicketPercent size={16} /></div>
+                        </div>
+                        <p className="text-2xl font-bold text-primary mb-1">{formatPrice(analyticsData.totalRevenue)}</p>
+                        <p className="text-xs text-text-secondary">Lifetime earnings</p>
                     </div>
-                    <div className="bg-surface p-6 rounded-sm shadow-sm border border-secondary/10">
-                        <p className="text-xs uppercase tracking-wider text-text-secondary mb-1">Total Orders</p>
-                        <p className="text-2xl font-bold text-primary">{analyticsData.totalOrders}</p>
-                        <p className="text-xs text-text-secondary mt-2">All statuses</p>
+
+                    <div className="bg-surface p-6 rounded-sm border border-secondary/10">
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-text-secondary">Total Orders</h3>
+                            <div className="bg-blue-50 text-blue-700 p-1.5 rounded-sm"><Package size={16} /></div>
+                        </div>
+                        <p className="text-2xl font-bold text-primary mb-1">{analyticsData.totalOrders}</p>
+                        <p className="text-xs text-text-secondary">Processed orders</p>
                     </div>
-                    <div className="bg-surface p-6 rounded-sm shadow-sm border border-secondary/10">
-                        <p className="text-xs uppercase tracking-wider text-text-secondary mb-1">Completed Orders</p>
-                        <p className="text-2xl font-bold text-green-600">{analyticsData.completedOrders || 0}</p>
-                        <p className="text-xs text-text-secondary mt-2">{formatPrice(analyticsData.completedRevenue || 0)} revenue</p>
+
+                    <div className="bg-surface p-6 rounded-sm border border-secondary/10">
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-text-secondary">Avg. Order Value</h3>
+                            <div className="bg-amber-50 text-amber-700 p-1.5 rounded-sm"><CheckCircle size={16} /></div>
+                        </div>
+                        <p className="text-2xl font-bold text-primary mb-1">{formatPrice(analyticsData.totalRevenue / (analyticsData.totalOrders || 1))}</p>
+                        <p className="text-xs text-text-secondary">Per transaction</p>
                     </div>
-                    <div className="bg-surface p-6 rounded-sm shadow-sm border border-secondary/10">
-                        <p className="text-xs uppercase tracking-wider text-text-secondary mb-1">Average Order Value</p>
-                        <p className="text-2xl font-bold text-primary">{formatPrice(analyticsData.totalRevenue / (analyticsData.totalOrders || 1))}</p>
-                        <p className="text-xs text-text-secondary mt-2">Per order</p>
+
+                    <div className="bg-surface p-6 rounded-sm border border-secondary/10">
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-text-secondary">Paid User Ratio</h3>
+                            <div className="bg-purple-50 text-purple-700 p-1.5 rounded-sm"><Users size={16} /></div>
+                        </div>
+                        <p className="text-2xl font-bold text-primary mb-1">
+                            {analyticsData.uniqueCustomers || 0}
+                            <span className="text-sm font-normal text-text-secondary ml-1">/ {analyticsData.totalUsers || 0}</span>
+                        </p>
+                        <p className="text-xs text-text-secondary">
+                            {analyticsData.totalUsers > 0
+                                ? `${((analyticsData.uniqueCustomers / analyticsData.totalUsers) * 100).toFixed(1)}% of registered users`
+                                : 'No data'}
+                        </p>
                     </div>
                 </div>
 
-                {/* Graph Row 1: Completed vs Pending + Sales Trend */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Completed vs Pending - Pie Chart */}
-                    <div className="bg-surface p-6 rounded-sm shadow-sm border border-secondary/10">
-                        <h3 className="text-lg font-bold text-primary mb-6">Order Status: Completed vs Pending</h3>
-                        <div className="flex items-center justify-center gap-8">
-                            {/* Simple CSS Pie Chart */}
-                            <div className="relative w-48 h-48">
-                                <svg viewBox="0 0 100 100" className="transform -rotate-90">
-                                    {/* Completed (Green) */}
+                {/* Charts Container */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Sales Trend */}
+                    <div className="lg:col-span-2 bg-surface p-6 rounded-sm border border-secondary/10">
+                        <h3 className="text-lg font-bold text-primary mb-6">Revenue Trend (7 Days)</h3>
+                        <div className="h-64 flex items-end justify-between gap-4 relative">
+                            {/* Grid Lines */}
+                            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                                {[0, 1, 2, 3].map(i => <div key={i} className="border-t border-dashed border-secondary/10 w-full h-px"></div>)}
+                            </div>
+
+                            {analyticsData.salesByDate?.length > 0 ? analyticsData.salesByDate.map((day) => {
+                                const height = (day.totalSales / maxSales) * 100;
+                                return (
+                                    <div key={day._id} className="flex-1 flex flex-col justify-end group relative items-center">
+                                        <div
+                                            className="w-full bg-primary/90 hover:bg-primary transition-all rounded-t-sm"
+                                            style={{ height: `${Math.max(height, 5)}%` }}
+                                        >
+                                            {/* Tooltip */}
+                                            <div className="absolute opacity-0 group-hover:opacity-100 bottom-full mb-2 bg-primary text-surface text-xs p-2 rounded pointer-events-none whitespace-nowrap z-10">
+                                                <div className="font-bold">{formatPrice(day.totalSales)}</div>
+                                                <div className="text-[10px] opacity-80">{day.count} orders</div>
+                                            </div>
+                                        </div>
+                                        <span className="text-[10px] text-text-secondary mt-2 font-medium">
+                                            {new Date(day._id).toLocaleDateString('en-US', { weekday: 'short' })}
+                                        </span>
+                                    </div>
+                                );
+                            }) : <div className="w-full h-full flex items-center justify-center text-sm text-text-secondary">No recent sales</div>}
+                        </div>
+                    </div>
+
+                    {/* Order Status Donut */}
+                    <div className="bg-surface p-6 rounded-sm border border-secondary/10 flex flex-col">
+                        <h3 className="text-lg font-bold text-primary mb-6">Order Status</h3>
+                        <div className="flex-1 flex flex-col items-center justify-center">
+                            <div className="relative w-40 h-40">
+                                <svg viewBox="0 0 100 100" className="transform -rotate-90 w-full h-full">
+                                    <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e5e5" strokeWidth="12" />
                                     <circle
-                                        r="40"
-                                        cx="50"
-                                        cy="50"
-                                        fill="transparent"
-                                        stroke="#10b981"
-                                        strokeWidth="20"
-                                        strokeDasharray={`${((analyticsData.completedOrders || 0) / (analyticsData.totalOrders || 1) * 251.2)} 251.2`}
-                                        className="transition-all duration-500"
-                                    />
-                                    {/* Pending (Orange) */}
-                                    <circle
-                                        r="40"
-                                        cx="50"
-                                        cy="50"
-                                        fill="transparent"
-                                        stroke="#f59e0b"
-                                        strokeWidth="20"
-                                        strokeDasharray={`${((analyticsData.pendingOrders || 0) / (analyticsData.totalOrders || 1) * 251.2)} 251.2`}
-                                        strokeDashoffset={`-${((analyticsData.completedOrders || 0) / (analyticsData.totalOrders || 1) * 251.2)}`}
-                                        className="transition-all duration-500"
+                                        cx="50" cy="50" r="40" fill="none" stroke="#1a4d2e" strokeWidth="12"
+                                        strokeDasharray={`${((analyticsData.completedOrders || 0) / (analyticsData.totalOrders || 1) * 251)} 251`}
+                                        className="transition-all duration-1000 ease-out"
                                     />
                                 </svg>
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="text-center">
-                                        <p className="text-2xl font-bold text-primary">{analyticsData.totalOrders}</p>
-                                        <p className="text-xs text-text-secondary">Total</p>
-                                    </div>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span className="text-2xl font-bold text-primary">{analyticsData.totalOrders}</span>
+                                    <span className="text-[10px] uppercase text-text-secondary">Total</span>
                                 </div>
                             </div>
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-4 h-4 bg-green-500 rounded-sm"></div>
-                                    <div>
-                                        <p className="text-sm font-bold text-primary">Completed</p>
-                                        <p className="text-xs text-text-secondary">{analyticsData.completedOrders || 0} orders ({((analyticsData.completedOrders || 0) / (analyticsData.totalOrders || 1) * 100).toFixed(0)}%)</p>
+                            <div className="mt-6 w-full space-y-3">
+                                <div className="flex justify-between items-center text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-3 h-3 bg-primary rounded-full"></div>
+                                        <span className="text-text-secondary">Completed</span>
                                     </div>
+                                    <span className="font-bold text-primary">{analyticsData.completedOrders}</span>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-4 h-4 bg-orange-500 rounded-sm"></div>
-                                    <div>
-                                        <p className="text-sm font-bold text-primary">Pending</p>
-                                        <p className="text-xs text-text-secondary">{analyticsData.pendingOrders || 0} orders ({((analyticsData.pendingOrders || 0) / (analyticsData.totalOrders || 1) * 100).toFixed(0)}%)</p>
+                                <div className="flex justify-between items-center text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-3 h-3 bg-gray-200 rounded-full"></div>
+                                        <span className="text-text-secondary">Pending</span>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Sales Trend (Last 7 Days) - Enhanced */}
-                    <div className="bg-surface p-6 rounded-sm shadow-sm border border-secondary/10">
-                        <div className="flex justify-between items-center mb-4">
-                            <div>
-                                <h3 className="text-lg font-bold text-primary">Sales Trend (Last 7 Days)</h3>
-                                <p className="text-xs text-text-secondary mt-1">Daily revenue and order count</p>
-                            </div>
-                            <button onClick={downloadCSV} className="text-xs text-accent uppercase font-bold tracking-wider hover:underline flex items-center gap-1">
-                                <FileText size={14} />
-                                Download CSV
-                            </button>
-                        </div>
-
-                        {/* Chart with gridlines and improved visualization */}
-                        <div className="relative">
-                            {/* Y-axis labels */}
-                            <div className="absolute left-0 top-0 bottom-8 w-12 flex flex-col justify-between text-right pr-2">
-                                <span className="text-[10px] text-text-secondary">{formatPrice(maxSales)}</span>
-                                <span className="text-[10px] text-text-secondary">{formatPrice(maxSales * 0.75)}</span>
-                                <span className="text-[10px] text-text-secondary">{formatPrice(maxSales * 0.5)}</span>
-                                <span className="text-[10px] text-text-secondary">{formatPrice(maxSales * 0.25)}</span>
-                                <span className="text-[10px] text-text-secondary">0</span>
-                            </div>
-
-                            {/* Chart area */}
-                            <div className="ml-14">
-                                {/* Horizontal gridlines */}
-                                <div className="relative h-56">
-                                    <div className="absolute inset-0 flex flex-col justify-between">
-                                        {[0, 1, 2, 3, 4].map(i => (
-                                            <div key={i} className="border-t border-dashed border-secondary/20"></div>
-                                        ))}
-                                    </div>
-
-                                    {/* Bars */}
-                                    <div className="absolute inset-0 flex items-end justify-between gap-2 pt-4">
-                                        {analyticsData.salesByDate && analyticsData.salesByDate.length > 0 ? analyticsData.salesByDate.map((day) => {
-                                            const date = new Date(day._id);
-                                            const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-                                            const monthDay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                                            const heightPercent = (day.totalSales / maxSales) * 100;
-
-                                            return (
-                                                <div key={day._id} className="flex flex-col items-center gap-2 flex-1 group relative">
-                                                    {/* Bar with value on top */}
-                                                    <div className="w-full flex flex-col items-center">
-                                                        {/* Value display on bar */}
-                                                        <div className={`text-[10px] font-bold mb-1 transition-opacity ${heightPercent > 20 ? 'text-primary' : 'text-text-secondary'}`}>
-                                                            {formatPrice(day.totalSales)}
-                                                        </div>
-
-                                                        {/* Bar */}
-                                                        <div
-                                                            className="w-full bg-gradient-to-t from-accent to-accent/60 hover:from-primary hover:to-primary/80 transition-all rounded-t-md relative shadow-sm"
-                                                            style={{ height: `${Math.max(heightPercent, 5)}%` }}
-                                                        >
-                                                            {/* Enhanced tooltip */}
-                                                            <div className="opacity-0 group-hover:opacity-100 absolute -top-16 left-1/2 transform -translate-x-1/2 bg-primary text-surface text-xs py-2 px-3 rounded-md shadow-lg z-10 pointer-events-none transition-opacity whitespace-nowrap">
-                                                                <div className="font-bold mb-1">{dayName}, {monthDay}</div>
-                                                                <div>Revenue: {formatPrice(day.totalSales)}</div>
-                                                                <div>Orders: {day.count}</div>
-                                                                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-primary"></div>
-                                                            </div>
-
-                                                            {/* Order count badge */}
-                                                            {heightPercent > 15 && (
-                                                                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-white/90 text-primary text-[9px] font-bold px-1.5 py-0.5 rounded-full">
-                                                                    {day.count}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Date labels */}
-                                                    <div className="text-center">
-                                                        <div className="text-[10px] font-bold text-primary">{dayName}</div>
-                                                        <div className="text-[9px] text-text-secondary">{monthDay}</div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        }) : (
-                                            <div className="w-full h-full flex items-center justify-center">
-                                                <p className="text-sm text-text-secondary">No sales data available for this period</p>
-                                            </div>
-                                        )}
-                                    </div>
+                                    <span className="font-bold text-primary">{analyticsData.pendingOrders}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Graph Row 2: Most Demanding Products */}
-                <div className="bg-surface p-6 rounded-sm shadow-sm border border-secondary/10">
-                    <h3 className="text-lg font-bold text-primary mb-6">Most Demanding Products (Top 5)</h3>
-                    <div className="space-y-4">
-                        {analyticsData.mostDemanding && analyticsData.mostDemanding.length > 0 ? analyticsData.mostDemanding.map((product, idx) => (
-                            <div key={idx} className="group">
-                                <div className="flex items-center justify-between mb-2">
-                                    <p className="text-sm font-bold text-primary">{product.name}</p>
-                                    <p className="text-xs text-accent font-bold">{product.totalQuantity} units sold</p>
-                                </div>
-                                <div className="w-full bg-secondary/10 rounded-full h-8 relative overflow-hidden">
-                                    <div
-                                        className="bg-gradient-to-r from-green-500 to-green-600 h-full rounded-full flex items-center px-3 transition-all duration-700"
-                                        style={{ width: `${(product.totalQuantity / maxDemand) * 100}%` }}
-                                    >
-                                        <span className="text-white text-xs font-bold">{formatPrice(product.totalRevenue)}</span>
+                {/* Products Analysis Row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Top Selling */}
+                    <div className="bg-surface p-6 rounded-sm border border-secondary/10 max-h-96 overflow-y-auto">
+                        <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
+                            <TrendingUp size={18} /> Best Sellers
+                        </h3>
+                        <div className="space-y-4">
+                            {analyticsData.mostDemanding?.map((product, idx) => (
+                                <div key={idx} className="flex items-center gap-4">
+                                    <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-xs font-bold text-primary">
+                                        {idx + 1}
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex justify-between mb-1">
+                                            <span className="text-sm font-medium text-primary">{product.name}</span>
+                                            <span className="text-xs font-bold text-primary">{product.totalQuantity} units</span>
+                                        </div>
+                                        <div className="w-full bg-secondary/10 h-1.5 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full bg-primary"
+                                                style={{ width: `${(product.totalQuantity / maxDemand) * 100}%` }}
+                                            ></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )) : <p className="text-center text-sm text-text-secondary py-8">No product data available</p>}
+                            ))}
+                            {(!analyticsData.mostDemanding || analyticsData.mostDemanding.length === 0) && (
+                                <p className="text-center text-sm text-text-secondary">No sales data yet.</p>
+                            )}
+                        </div>
                     </div>
-                </div>
 
-                {/* Graph Row 3: Least Demanding Products */}
-                <div className="bg-surface p-6 rounded-sm shadow-sm border border-secondary/10">
-                    <h3 className="text-lg font-bold text-primary mb-6">Least Demanding Products (Bottom 5)</h3>
-                    <div className="space-y-4">
-                        {analyticsData.leastDemanding && analyticsData.leastDemanding.length > 0 ? analyticsData.leastDemanding.map((product, idx) => (
-                            <div key={idx}>
-                                <div className="flex items-center justify-between mb-2">
-                                    <p className="text-sm font-bold text-primary">{product.name}</p>
-                                    <p className="text-xs text-red-600 font-bold">{product.totalQuantity} units sold</p>
-                                </div>
-                                <div className="w-full bg-secondary/10 rounded-full h-8 relative overflow-hidden">
-                                    <div
-                                        className="bg-gradient-to-r from-red-500 to-red-600 h-full rounded-full flex items-center px-3 transition-all duration-700"
-                                        style={{ width: `${(product.totalQuantity / maxDemand) * 100}%` }}
-                                    >
-                                        <span className="text-white text-xs font-bold">{formatPrice(product.totalRevenue)}</span>
+                    {/* Low Stock / Least Demanding */}
+                    <div className="bg-surface p-6 rounded-sm border border-secondary/10 max-h-96 overflow-y-auto">
+                        <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
+                            <AlertCircle size={18} /> Low Performing / Unsold
+                        </h3>
+                        <div className="space-y-4">
+                            {analyticsData.leastDemanding?.slice(0, 5).map((product, idx) => (
+                                <div key={idx} className="flex items-center gap-4">
+                                    <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-xs font-bold text-red-600">
+                                        !
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex justify-between mb-1">
+                                            <span className="text-sm font-medium text-primary">{product.name}</span>
+                                            <span className="text-xs font-medium text-text-secondary">
+                                                {product.totalQuantity === 0 ? '0 Sales' : `${product.totalQuantity} units`}
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-secondary/10 h-1.5 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full bg-red-400"
+                                                style={{ width: `${Math.max((product.totalQuantity / maxDemand) * 100, 5)}%` }}
+                                            ></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )) : <p className="text-center text-sm text-text-secondary py-8">No product data available</p>}
-                    </div>
-                </div>
-
-                {/* Graph Row 4: Top Revenue Products */}
-                <div className="bg-surface p-6 rounded-sm shadow-sm border border-secondary/10">
-                    <h3 className="text-lg font-bold text-primary mb-6">Top Revenue Generating Products (Top 5)</h3>
-                    <div className="space-y-4">
-                        {analyticsData.topRevenueProducts && analyticsData.topRevenueProducts.length > 0 ? analyticsData.topRevenueProducts.map((product, idx) => (
-                            <div key={idx}>
-                                <div className="flex items-center justify-between mb-2">
-                                    <p className="text-sm font-bold text-primary">{product.name}</p>
-                                    <p className="text-xs text-primary font-bold">{formatPrice(product.totalRevenue)}</p>
-                                </div>
-                                <div className="w-full bg-secondary/10 rounded-full h-8 relative overflow-hidden">
-                                    <div
-                                        className="bg-gradient-to-r from-blue-500 to-indigo-600 h-full rounded-full flex items-center px-3 transition-all duration-700"
-                                        style={{ width: `${(product.totalRevenue / maxRevenue) * 100}%` }}
-                                    >
-                                        <span className="text-white text-xs font-bold">{product.totalQuantity} units</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )) : <p className="text-center text-sm text-text-secondary py-8">No product data available</p>}
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>

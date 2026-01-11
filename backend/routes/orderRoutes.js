@@ -64,7 +64,16 @@ router.get('/', protect, admin, async (req, res) => {
 router.get('/analytics', protect, admin, async (req, res) => {
     try {
         const orders = await Order.find({}).populate('orderItems.product');
+        const Product = require('../models/Product');
+        const User = require('../models/User'); // Import User model
+        const allProducts = await Product.find({});
+
         const totalOrders = orders.length;
+        const totalUsers = await User.countDocuments({}); // Total registered users
+
+        // Count unique customers (users who have at least one order)
+        const uniqueCustomers = new Set(orders.map(o => o.user.toString())).size;
+
         const totalRevenue = orders.reduce((acc, order) => acc + (order.totalPrice || 0), 0);
 
         // Order Status Distribution (for pie chart)
@@ -75,10 +84,10 @@ router.get('/analytics', protect, admin, async (req, res) => {
         }, {});
 
         // Completed vs Pending
-        const completedOrders = orders.filter(o => o.status === 'Delivered').length;
-        const pendingOrders = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Closed').length;
-        const completedRevenue = orders.filter(o => o.status === 'Delivered').reduce((acc, o) => acc + o.totalPrice, 0);
-        const pendingRevenue = orders.filter(o => o.status !== 'Delivered').reduce((acc, o) => acc + o.totalPrice, 0);
+        const completedOrders = orders.filter(o => ['Delivered', 'Shipped'].includes(o.status)).length;
+        const pendingOrders = orders.filter(o => !['Delivered', 'Shipped', 'Closed', 'Cancelled'].includes(o.status)).length;
+        const completedRevenue = orders.filter(o => ['Delivered', 'Shipped'].includes(o.status)).reduce((acc, o) => acc + o.totalPrice, 0);
+        const pendingRevenue = orders.filter(o => !['Delivered', 'Shipped', 'Closed', 'Cancelled'].includes(o.status)).reduce((acc, o) => acc + o.totalPrice, 0);
 
         // Sales by Date (Last 7 days)
         const salesByDate = await Order.aggregate([
@@ -95,14 +104,27 @@ router.get('/analytics', protect, admin, async (req, res) => {
 
         // Product Demand Analysis
         const productStats = {};
+
+        // Initialize with all products (0 sales)
+        allProducts.forEach(product => {
+            productStats[product.name] = {
+                name: product.name,
+                totalQuantity: 0,
+                totalRevenue: 0,
+                orderCount: 0
+            };
+        });
+
+        // Update with order data
         orders.forEach(order => {
             order.orderItems.forEach(item => {
                 const productName = item.name;
                 if (!productStats[productName]) {
+                    // Handle case where product name in order might differ slightly or product deleted but exists in order
                     productStats[productName] = { name: productName, totalQuantity: 0, totalRevenue: 0, orderCount: 0 };
                 }
-                productStats[productName].totalQuantity += item.quantity;
-                productStats[productName].totalRevenue += item.price * item.quantity;
+                productStats[productName].totalQuantity += (item.quantity || 0);
+                productStats[productName].totalRevenue += (item.price || 0) * (item.quantity || 0);
                 productStats[productName].orderCount += 1;
             });
         });
@@ -143,6 +165,8 @@ router.get('/analytics', protect, admin, async (req, res) => {
         res.json({
             totalOrders,
             totalRevenue,
+            totalUsers,
+            uniqueCustomers,
             completedOrders,
             pendingOrders,
             completedRevenue,

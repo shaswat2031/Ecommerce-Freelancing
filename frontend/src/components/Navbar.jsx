@@ -3,6 +3,7 @@ import { ShoppingBag, Search, Menu, X, User } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useCurrency } from '../context/CurrencyContext';
 import { useCart } from '../context/CartContext';
+import { useProducts } from '../context/ProductContext';
 import logo from '../assets/SIRABALOGO.png';
 
 const Navbar = () => {
@@ -16,6 +17,7 @@ const Navbar = () => {
 
     const { currency, setCurrency, availableCurrencies } = useCurrency();
     const { getCartCount } = useCart();
+    const { products } = useProducts();
     const cartCount = getCartCount();
 
     // Currency symbols mapping - 27 major world currencies
@@ -123,11 +125,11 @@ const Navbar = () => {
                     </div>
 
                     {/* Desktop Navigation / Search Bar Transition */}
-                    <div className="flex-1 flex items-center justify-end md:justify-center px-4 md:px-8">
+                    <div className="flex-1 flex items-center justify-end md:justify-center px-4 md:px-8 relative">
                         {!isSearchOpen ? (
                             /* Standard Nav Links */
                             <div className="hidden md:flex items-center space-x-8 lg:space-x-12 animate-fade-in">
-                                {['Shop', 'About Us', 'Certification', 'B2B', 'Contact Us'].map((item) => (
+                                {['Shop', 'About Us', 'Certification', 'Contact Us', 'B2B'].map((item) => (
                                     <Link
                                         key={item}
                                         to={`/${item.toLowerCase().replace(/ & /g, '-').replace(' ', '-')}`}
@@ -153,6 +155,51 @@ const Navbar = () => {
                                 <button onClick={handleCloseSearch} className="absolute right-0 top-1/2 -translate-y-1/2 text-primary/50 text-xs uppercase tracking-wider font-bold hover:text-primary transition-colors">
                                     Close
                                 </button>
+
+                                {/* Live Search Results Dropdown */}
+                                {searchQuery.trim().length > 0 && (
+                                    <div className="absolute top-full left-0 w-full bg-surface shadow-xl rounded-b-sm border-t border-secondary/10 mt-4 max-h-96 overflow-y-auto z-50 animate-fade-in">
+                                        {products.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.category.toLowerCase().includes(searchQuery.toLowerCase())).length > 0 ? (
+                                            <div className="py-2">
+                                                {products
+                                                    .filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.category.toLowerCase().includes(searchQuery.toLowerCase()))
+                                                    .slice(0, 5)
+                                                    .map(product => (
+                                                        <Link
+                                                            key={product._id || product.id}
+                                                            to={`/product/${product.slug}`}
+                                                            onClick={handleCloseSearch}
+                                                            className="flex items-center gap-4 px-4 py-3 hover:bg-secondary/5 transition-colors group"
+                                                        >
+                                                            <div className="w-12 h-12 bg-white border border-secondary/10 rounded-sm p-1 flex-shrink-0">
+                                                                <img src={product.image} alt={product.name} className="w-full h-full object-contain" />
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <h4 className="font-heading text-sm font-bold text-primary group-hover:text-accent truncate">{product.name}</h4>
+                                                                <p className="text-xs text-text-secondary">{product.category}</p>
+                                                            </div>
+                                                            <div className="text-sm font-medium text-primary">
+                                                                {currencySymbols[currency] || currency}{Math.round(product.price * (currency === 'USD' ? 0.012 : 1)).toLocaleString()}
+                                                            </div>
+                                                        </Link>
+                                                    ))}
+                                                <button
+                                                    onClick={() => {
+                                                        navigate(`/shop?keyword=${encodeURIComponent(searchQuery.trim())}`);
+                                                        handleCloseSearch();
+                                                    }}
+                                                    className="w-full text-center py-3 text-xs uppercase tracking-wider font-bold text-accent hover:text-primary transition-colors border-t border-secondary/10 mt-2"
+                                                >
+                                                    View All Results
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="p-8 text-center text-text-secondary text-sm">
+                                                No products found for "{searchQuery}"
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -254,7 +301,7 @@ const Navbar = () => {
                     </div>
                 </div>
                 <div className="px-4 pt-2 pb-6 space-y-2">
-                    {['Shop', 'About Us', 'Certification', 'B2B', 'Contact Us'].map((item) => (
+                    {['Shop', 'Track Order', 'About Us', 'Certification', 'Contact Us'].map((item) => (
                         <Link
                             key={item}
                             to={`/${item.toLowerCase().replace(/ & /g, '-').replace(' ', '-')}`}
