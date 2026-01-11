@@ -194,28 +194,40 @@ router.post('/forgotpassword', async (req, res) => {
             <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
         `;
 
+        // Check if email is configured
+        if (!process.env.EMAIL_USER || process.env.EMAIL_USER === 'your_email@gmail.com') {
+            // Development mode: Return link directly without sending email
+            console.log(`Password reset requested for ${user.email}`);
+            console.log(`Reset URL: ${resetUrl}`);
+            return res.json({
+                message: 'Password reset link generated (Development Mode - Email not configured)',
+                resetUrl: resetUrl // Only for development
+            });
+        }
+
         try {
             const transporter = nodemailer.createTransport({
-                service: 'gmail', // Or use strict SMTP
+                service: 'gmail',
                 auth: {
-                    user: process.env.EMAIL_USER || 'your_email@gmail.com', // Needs env var
-                    pass: process.env.EMAIL_PASS || 'your_password'
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS
                 }
             });
 
             await transporter.sendMail({
-                from: 'Siraba Organic <noreply@siraba.com>',
+                from: 'Siraba Organic <info@sirabaorganic.com>',
                 to: user.email,
                 subject: 'Password Reset Request',
                 html: message
             });
 
-            res.json({ message: 'Email sent' });
+            res.json({ message: 'Password reset email sent successfully' });
         } catch (error) {
+            console.error('Email sending error:', error);
             user.resetPasswordToken = undefined;
             user.resetPasswordExpire = undefined;
             await user.save();
-            return res.status(500).json({ message: 'Email could not be sent' });
+            return res.status(500).json({ message: 'Email could not be sent. Please try again later.' });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });

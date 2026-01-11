@@ -75,9 +75,9 @@ const Certification = () => {
                 <div className="max-w-7xl mx-auto space-y-12">
                     <div className="text-center max-w-3xl mx-auto space-y-4">
                         <Shield size={40} className="text-accent mx-auto mb-4" strokeWidth={1} />
-                        <h2 className="font-heading text-3xl md:text-4xl text-primary font-bold">{certData?.sectionTitle || "OUR CERTIFICATION"}</h2>
+                        <h2 className="font-heading text-3xl md:text-4xl text-primary font-bold">{certData?.sectionTitle || "OUR CERTIFICATIONS"}</h2>
                         <p className="text-text-secondary text-lg font-light leading-relaxed">
-                            {certData?.sectionDescription || "We provide as per India Organic (NPOP), USDA (NOP), Kosher and EU Standards. We adhere to stringent norms set by APEDA, Ministry of Agriculture with respect to transaction certificates used in traceability of the organic crops."}
+                            {certData?.sectionDescription || "Siraba Organic is certified under multiple internationally recognized organic standards. We comply with India Organic (NPOP), USDA Organic (NOP), European Union Organic Regulations, and Kosher standards. Our certifications ensure complete traceability, quality assurance, and adherence to the strictest organic farming practices from farm to table."}
                         </p>
                     </div>
 
@@ -96,10 +96,79 @@ const Certification = () => {
                             ))
                         ) : (
                             <>
-                                {/* Fallback Cards */}
-                                <div className="bg-surface p-8 rounded-sm shadow-sm border-t-4 border-accent">
-                                    <h3 className="font-bold text-xl mb-2">Global B2B Solutions</h3>
-                                    <p className="text-sm">We are having B2B business scenario...</p>
+                                {/* India Organic (NPOP) */}
+                                <div className="bg-surface p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow duration-300 border-t-4 border-accent">
+                                    <div className="bg-secondary/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
+                                        <Globe size={28} className="text-primary" strokeWidth={1.5} />
+                                    </div>
+                                    <h3 className="font-heading text-xl font-bold mb-3 text-primary">India Organic (NPOP)</h3>
+                                    <p className="text-text-secondary font-light text-sm leading-relaxed">
+                                        Certified under the National Programme for Organic Production (NPOP) by APEDA, Ministry of Agriculture & Farmers Welfare, Government of India. This ensures our products meet India's national standards for organic agriculture, processing, and quality control.
+                                    </p>
+                                    <ul className="mt-4 space-y-2 text-xs text-text-secondary">
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle size={14} className="text-accent mt-0.5 flex-shrink-0" />
+                                            <span>Complete farm-to-consumer traceability</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle size={14} className="text-accent mt-0.5 flex-shrink-0" />
+                                            <span>Rigorous third-party verification</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle size={14} className="text-accent mt-0.5 flex-shrink-0" />
+                                            <span>Annual inspection and certification</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                {/* USDA Organic (NOP) */}
+                                <div className="bg-surface p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow duration-300 border-t-4 border-accent">
+                                    <div className="bg-secondary/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
+                                        <Award size={28} className="text-primary" strokeWidth={1.5} />
+                                    </div>
+                                    <h3 className="font-heading text-xl font-bold mb-3 text-primary">USDA Organic (NOP)</h3>
+                                    <p className="text-text-secondary font-light text-sm leading-relaxed">
+                                        Compliant with United States Department of Agriculture National Organic Program standards. This certification validates our commitment to producing organic products that meet strict USDA requirements for American and international markets.
+                                    </p>
+                                    <ul className="mt-4 space-y-2 text-xs text-text-secondary">
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle size={14} className="text-accent mt-0.5 flex-shrink-0" />
+                                            <span>No synthetic fertilizers or pesticides</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle size={14} className="text-accent mt-0.5 flex-shrink-0" />
+                                            <span>Non-GMO verified production</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle size={14} className="text-accent mt-0.5 flex-shrink-0" />
+                                            <span>Sustainable farming practices</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                {/* EU Organic & Kosher */}
+                                <div className="bg-surface p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow duration-300 border-t-4 border-accent">
+                                    <div className="bg-secondary/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
+                                        <FileCheck size={28} className="text-primary" strokeWidth={1.5} />
+                                    </div>
+                                    <h3 className="font-heading text-xl font-bold mb-3 text-primary">EU Organic & Kosher</h3>
+                                    <p className="text-text-secondary font-light text-sm leading-relaxed">
+                                        Certified according to European Union Organic Regulations (EC No. 834/2007) and Kosher standards. These certifications ensure our products meet the highest European quality benchmarks and religious dietary requirements.
+                                    </p>
+                                    <ul className="mt-4 space-y-2 text-xs text-text-secondary">
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle size={14} className="text-accent mt-0.5 flex-shrink-0" />
+                                            <span>EU organic logo eligibility</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle size={14} className="text-accent mt-0.5 flex-shrink-0" />
+                                            <span>Kosher supervision and certification</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle size={14} className="text-accent mt-0.5 flex-shrink-0" />
+                                            <span>Strict environmental protection</span>
+                                        </li>
+                                    </ul>
                                 </div>
                             </>
                         )}

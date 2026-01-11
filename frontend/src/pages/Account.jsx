@@ -102,8 +102,7 @@ const Account = () => {
             'Pending': { color: 'yellow', icon: Clock, step: 1, label: 'Order Placed' },
             'Approved': { color: 'blue', icon: CheckCircle, step: 2, label: 'Confirmed' },
             'Packed': { color: 'purple', icon: PackageCheck, step: 3, label: 'Packed' },
-            'Shipped': { color: 'indigo', icon: Truck, step: 4, label: 'Shipped' },
-            'Delivered': { color: 'green', icon: CheckCircle, step: 5, label: 'Delivered' }
+            'Shipped': { color: 'indigo', icon: Truck, step: 4, label: 'Shipped' }
         };
         return statusMap[status] || statusMap['Pending'];
     };
@@ -302,7 +301,7 @@ const Account = () => {
                                         value={authData.name}
                                         onChange={handleAuthChange}
                                         className="w-full pl-10 pr-4 py-2.5 border border-secondary/20 rounded-sm focus:border-accent focus:outline-none transition-colors"
-                                        placeholder="John Doe"
+                                        placeholder="Prasad Shaswat"
                                         required
                                     />
                                 </div>
@@ -446,7 +445,7 @@ const Account = () => {
                                             <div>
                                                 <p className="text-text-secondary text-xs uppercase tracking-wider font-medium">Pending Delivery</p>
                                                 <h3 className="text-3xl font-bold text-primary mt-2">
-                                                    {orders.filter(o => o.status !== 'Delivered').length}
+                                                    {orders.filter(o => o.status !== 'Shipped').length}
                                                 </h3>
                                             </div>
                                             <Truck className="text-primary/20" size={32} />
@@ -725,7 +724,7 @@ const Account = () => {
                                                                     <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-primary -translate-y-1/2 rounded-full transition-all duration-500" style={{ width: `${((statusInfo.step - 1) / 4) * 100}%` }}></div>
 
                                                                     <div className="relative flex justify-between">
-                                                                        {['Placed', 'Confirmed', 'Packed', 'Shipped', 'Delivered'].map((step, idx) => {
+                                                                        {['Placed', 'Confirmed', 'Packed', 'Shipped'].map((step, idx) => {
                                                                             const isCompleted = idx < statusInfo.step;
                                                                             const isCurrent = idx === statusInfo.step - 1;
 
@@ -1008,9 +1007,9 @@ const Account = () => {
                                             <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-primary flex-shrink-0">
                                                 <Mail size={20} />
                                             </div>
-                                            <div>
-                                                <h4 className="font-bold text-sm">Email</h4>
-                                                <p className="text-text-secondary text-sm">support@sirabaorganic.com</p>
+                                            <div className="flex-1">
+                                                <p className="font-bold text-primary text-sm">Email Support</p>
+                                                <p className="text-text-secondary text-sm">info@sirabaorganic.com</p>
                                                 <p className="text-xs text-text-secondary mt-1">Response time: 24 hours</p>
                                             </div>
                                         </div>

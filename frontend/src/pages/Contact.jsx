@@ -74,7 +74,6 @@ const Contact = () => {
                                 <div>
                                     <h3 className="font-heading text-xl font-bold text-primary mb-2">Email Us</h3>
                                     <p className="text-text-secondary font-light">info@sirabaorganic.com</p>
-                                    <p className="text-text-secondary font-light">sales@sirabaorganic.com</p>
                                 </div>
                             </div>
 
@@ -104,7 +103,7 @@ const Contact = () => {
                                         value={formData.firstName}
                                         onChange={handleChange}
                                         className="w-full bg-secondary/5 border border-transparent focus:border-accent p-3 rounded-sm focus:outline-none transition-colors"
-                                        placeholder="John"
+                                        placeholder="Prasad"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -116,7 +115,7 @@ const Contact = () => {
                                         value={formData.lastName}
                                         onChange={handleChange}
                                         className="w-full bg-secondary/5 border border-transparent focus:border-accent p-3 rounded-sm focus:outline-none transition-colors"
-                                        placeholder="Doe"
+                                        placeholder="Shaswat"
                                     />
                                 </div>
                             </div>
@@ -130,7 +129,7 @@ const Contact = () => {
                                     value={formData.email}
                                     onChange={handleChange}
                                     className="w-full bg-secondary/5 border border-transparent focus:border-accent p-3 rounded-sm focus:outline-none transition-colors"
-                                    placeholder="john@example.com"
+                                    placeholder="prasad@example.com"
                                 />
                             </div>
 

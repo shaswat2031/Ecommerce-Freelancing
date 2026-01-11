@@ -33,6 +33,7 @@ const productSchema = mongoose.Schema({
     },
     category: { type: String, required: true },
     tag: { type: String },
+    hsn: { type: String, default: '0909' }, // HSN code for GST (default: spices/saffron)
     rating: { type: Number, default: 0 },
     numReviews: { type: Number, default: 0 },
     reviews: [reviewSchema],

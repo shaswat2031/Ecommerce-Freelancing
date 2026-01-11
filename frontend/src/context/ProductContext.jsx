@@ -98,7 +98,6 @@ export const ProductProvider = ({ children }) => {
             products,
             addProduct,
             updateProduct,
-            updateProduct,
             deleteProduct,
             searchProducts,
             homeContent,

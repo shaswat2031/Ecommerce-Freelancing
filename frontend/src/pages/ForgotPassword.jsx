@@ -8,16 +8,23 @@ const ForgotPassword = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [resetUrl, setResetUrl] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
         setMessage('');
+        setResetUrl('');
 
         try {
             const { data } = await client.post('/auth/forgotpassword', { email });
             setMessage(data.message);
+
+            // If development mode, show the reset link
+            if (data.resetUrl) {
+                setResetUrl(data.resetUrl);
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Something went wrong');
         } finally {
@@ -42,6 +49,29 @@ const ForgotPassword = () => {
                 {error && (
                     <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-sm flex items-center gap-2">
                         <AlertCircle size={16} /> {error}
+                    </div>
+                )}
+
+                {resetUrl && (
+                    <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-sm">
+                        <p className="text-xs font-bold uppercase text-blue-900 mb-2">Reset Link (Development Mode)</p>
+                        <a
+                            href={resetUrl}
+                            className="text-sm text-blue-600 hover:text-blue-800 break-all underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {resetUrl}
+                        </a>
+                        <button
+                            onClick={() => {
+                                navigator.clipboard.writeText(resetUrl);
+                                alert('Reset link copied to clipboard!');
+                            }}
+                            className="mt-2 w-full text-xs bg-blue-600 text-white py-2 px-3 rounded-sm hover:bg-blue-700 transition-colors"
+                        >
+                            Copy Link
+                        </button>
                     </div>
                 )}
 

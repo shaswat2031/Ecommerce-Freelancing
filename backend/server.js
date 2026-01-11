@@ -10,10 +10,9 @@ const cartRoutes = require('./routes/cartRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const inquiryRoutes = require('./routes/inquiryRoutes');
 const couponRoutes = require('./routes/couponRoutes');
+const invoiceRoutes = require('./routes/invoiceRoutes');
 
 dotenv.config();
-
-connectDB();
 
 const http = require('http');
 const { Server } = require('socket.io');
@@ -78,6 +77,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/coupons', couponRoutes);
+app.use('/api/invoices', invoiceRoutes);
 app.use('/api/b2b', require('./routes/b2bRoutes'));
 app.use('/api/settings', require('./routes/settingsRoutes'));
 app.use('/api/contact', require('./routes/contactRoutes'));
@@ -96,4 +96,17 @@ app.get('/api/health', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, console.log(`Server running on port ${PORT}`));
+// Start server only after DB connection
+const startServer = async () => {
+    try {
+        await connectDB();
+        server.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+};
+
+startServer();

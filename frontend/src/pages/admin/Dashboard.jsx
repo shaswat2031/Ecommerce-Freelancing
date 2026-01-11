@@ -5,9 +5,10 @@ import { useOrders } from '../../context/OrderContext';
 import { useSocket } from '../../context/SocketContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { Navigate } from 'react-router-dom';
-import { Users, ShoppingBag, Package, Settings, LogOut, Check, X, Plus, Edit2, Trash2, Eye, FileText, TicketPercent, ChevronDown, ChevronUp, Clock, CheckCircle, Truck, PackageCheck, Menu, LineChart as ChartIcon, Mail } from 'lucide-react';
+import { Users, ShoppingBag, Package, Settings, LogOut, Check, X, Plus, Edit2, Trash2, Eye, FileText, TicketPercent, ChevronDown, ChevronUp, Clock, CheckCircle, Truck, PackageCheck, Menu, LineChart as ChartIcon, Mail, Download } from 'lucide-react';
 import client from '../../api/client';
 import Logo from '../../assets/SIRABALOGO.png';
+import { downloadInvoice, previewInvoice } from '../../utils/invoiceUtils';
 
 const AdminDashboard = () => {
     const { isAdmin, logout } = useAuth();
@@ -307,118 +308,324 @@ const AdminDashboard = () => {
     const handlePrintInvoice = (order) => {
         const invoiceHTML = `
             <!DOCTYPE html>
-            <html>
+            <html lang="en">
             <head>
-                <title>Invoice #${order._id.slice(-8)}</title>
-                <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Invoice - #${order._id.slice(-8).toUpperCase()}</title>
                 <style>
-                    body { font-family: 'Inter', sans-serif; padding: 40px; color: #1a1a1a; background: #fff; -webkit-print-color-adjust: exact; }
-                    .invoice-container { max-width: 850px; margin: auto; padding: 40px; border: 1px solid #e5e7eb; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: relative; overflow: hidden; }
-                    
-                    /* Decorative Top Bar */
-                    .invoice-container::before {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        height: 6px;
-                        background: linear-gradient(90deg, #D4AF37, #F5D061, #D4AF37);
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    @page { size: A4; margin: 15mm; }
+                    body {
+                        font-family: 'Helvetica Neue', Arial, sans-serif;
+                        background: white;
+                        color: #333;
+                        font-size: 13px;
+                        line-height: 1.4;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
                     }
-
-                    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 50px; padding-bottom: 20px; border-bottom: 2px solid #f3f4f6; }
-                    .logo-section img { height: 80px; width: auto; object-fit: contain; }
-                    .company-info { text-align: right; font-size: 13px; color: #6b7280; line-height: 1.6; }
-                    .company-name { font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 5px; letter-spacing: 1px; }
-
-                    .invoice-details { display: flex; justify-content: space-between; margin-bottom: 40px; }
-                    .bill-to h3, .order-meta h3 { font-family: 'Cinzel', serif; font-size: 14px; color: #D4AF37; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px; display: inline-block; }
-                    .bill-to p, .order-meta p { font-size: 14px; margin: 4px 0; color: #374151; }
-                    .order-meta { text-align: right; }
-                    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #f3f4f6; color: #374151; margin-top: 5px; }
-
-                    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-                    th { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #fff; background: #1f2937; padding: 12px 16px; text-align: left; }
-                    th:last-child { text-align: right; }
-                    td { padding: 16px; border-bottom: 1px solid #f3f4f6; font-size: 14px; color: #374151; }
-                    td:last-child { text-align: right; font-weight: 600; color: #111827; }
-                    tr:last-child td { border-bottom: none; }
-                    .item-name { font-weight: 600; color: #111827; display: block; margin-bottom: 4px; }
-                    .item-sku { font-size: 11px; color: #9ca3af; }
-
-                    .totals { width: 100%; display: flex; justify-content: flex-end; }
-                    .totals-box { width: 300px; }
-                    .total-row { display: flex; justify-content: space-between; padding: 10px 0; font-size: 14px; color: #6b7280; }
-                    .total-row.final { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; color: #111827; border-top: 2px solid #e5e7eb; margin-top: 10px; padding-top: 15px; }
-
-                    .footer { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px solid #f3f4f6; font-size: 12px; color: #9ca3af; }
-                    .footer p { margin-bottom: 8px; }
-                    .auth-sign { font-family: 'Cinzel', serif; color: #D4AF37; font-size: 16px; margin-top: 10px; }
-
+                    .invoice-container {
+                        max-width: 210mm;
+                        margin: 0 auto;
+                        background: white;
+                        position: relative;
+                    }
+                    .accent-bar {
+                        height: 6px;
+                        background: linear-gradient(90deg, #D4AF37 0%, #F5D061 50%, #D4AF37 100%);
+                        margin-bottom: 20px;
+                    }
+                    .header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start;
+                        margin-bottom: 25px;
+                        padding-bottom: 15px;
+                        border-bottom: 2px solid #e5e5e5;
+                    }
+                    .logo-section {
+                        display: flex;
+                        align-items: center;
+                        gap: 15px;
+                    }
+                    .logo {
+                        width: 70px;
+                        height: 70px;
+                    }
+                    .company-info h1 {
+                        font-size: 24px;
+                        color: #1a4d2e;
+                        font-weight: 800;
+                        margin-bottom: 3px;
+                    }
+                    .company-tagline {
+                        color: #D4AF37;
+                        font-size: 10px;
+                        text-transform: uppercase;
+                        letter-spacing: 1.5px;
+                        font-weight: 600;
+                        margin-bottom: 8px;
+                    }
+                    .company-contact {
+                        color: #666;
+                        font-size: 11px;
+                        line-height: 1.5;
+                    }
+                    .invoice-label {
+                        text-align: right;
+                    }
+                    .invoice-label h2 {
+                        font-size: 12px;
+                        color: #D4AF37;
+                        font-weight: 700;
+                        margin-bottom: 3px;
+                        letter-spacing: 2px;
+                    }
+                    .invoice-label .inv-number {
+                        font-size: 28px;
+                        color: #1a4d2e;
+                        font-weight: 700;
+                    }
+                    .detail-cards {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr 1fr;
+                        gap: 15px;
+                        margin-bottom: 20px;
+                    }
+                    .card {
+                        background: #fafaf8;
+                        padding: 15px;
+                        border-radius: 6px;
+                        border-left: 3px solid #D4AF37;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+                    }
+                    .card h3 {
+                        font-size: 10px;
+                        color: #D4AF37;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                        margin-bottom: 8px;
+                        font-weight: 700;
+                    }
+                    .card p {
+                        font-size: 11px;
+                        color: #444;
+                        line-height: 1.5;
+                        margin: 2px 0;
+                    }
+                    .card .highlight {
+                        color: #1a4d2e;
+                        font-weight: 700;
+                        font-size: 12px;
+                    }
+                    .status-tag {
+                        background: linear-gradient(135deg, #1a4d2e 0%, #2d7a4f 100%);
+                        color: white;
+                        padding: 4px 10px;
+                        border-radius: 15px;
+                        font-size: 9px;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        display: inline-block;
+                        margin-top: 6px;
+                    }
+                    .items-section {
+                        margin-bottom: 15px;
+                    }
+                    .section-title {
+                        font-size: 14px;
+                        color: #D4AF37;
+                        font-weight: 700;
+                        margin-bottom: 12px;
+                        padding-bottom: 6px;
+                        border-bottom: 2px solid #7cb342;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 12px;
+                    }
+                    thead th {
+                        background: #1a4d2e;
+                        color: white;
+                        padding: 10px 8px;
+                        text-align: left;
+                        font-size: 10px;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
+                    thead th:first-child {
+                        border-radius: 5px 0 0 0;
+                    }
+                    thead th:last-child {
+                        border-radius: 0 5px 0 0;
+                        text-align: right;
+                    }
+                    tbody tr {
+                        border-bottom: 1px solid #f0f0f0;
+                    }
+                    tbody tr:last-child {
+                        border-bottom: none;
+                    }
+                    tbody td {
+                        padding: 12px 8px;
+                        color: #444;
+                    }
+                    tbody td:nth-child(2),
+                    tbody td:nth-child(3),
+                    tbody td:nth-child(4) {
+                        text-align: right;
+                    }
+                    .product-name {
+                        font-weight: 700;
+                        color: #1a4d2e;
+                        margin-bottom: 3px;
+                        font-size: 13px;
+                    }
+                    .product-desc {
+                        color: #999;
+                        font-size: 11px;
+                        font-style: italic;
+                    }
+                    .totals-section {
+                        margin-top: 15px;
+                    }
+                    .totals-box {
+                        margin-left: auto;
+                        width: 280px;
+                        background: #fafaf8;
+                        border-radius: 6px;
+                        padding: 15px;
+                        border-left: 3px solid #D4AF37;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+                    }
+                    .total-row {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 8px 0;
+                        font-size: 12px;
+                        color: #555;
+                        border-bottom: 1px solid #e5e5e5;
+                    }
+                    .total-row:last-child {
+                        border-bottom: none;
+                    }
+                    .total-row.grand {
+                        background: linear-gradient(135deg, #1a4d2e 0%, #2d7a4f 100%);
+                        color: white;
+                        margin: 12px -15px -15px;
+                        padding: 15px;
+                        border-radius: 0 0 6px 6px;
+                        font-size: 16px;
+                        font-weight: 700;
+                    }
+                    .footer {
+                        margin-top: 25px;
+                        padding-top: 15px;
+                        text-align: center;
+                        border-top: 1px solid #e5e5e5;
+                    }
+                    .footer p {
+                        color: #777;
+                        font-size: 11px;
+                        line-height: 1.6;
+                        margin-bottom: 15px;
+                    }
+                    .signature-section {
+                        margin-top: 20px;
+                        text-align: right;
+                    }
+                    .sig-line {
+                        display: inline-block;
+                        border-top: 2px solid #1a4d2e;
+                        padding-top: 6px;
+                        width: 180px;
+                        font-size: 10px;
+                        color: #666;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                        font-weight: 600;
+                    }
                     @media print {
                         body { background: none; padding: 0; }
-                        .invoice-container { box-shadow: none; border: none; margin: 0; padding: 0; }
+                        .invoice-container { margin: 0; padding: 0; }
                     }
                 </style>
             </head>
             <body>
                 <div class="invoice-container">
+                    <div class="accent-bar"></div>
+
                     <div class="header">
                         <div class="logo-section">
-                            <img src="${Logo}" alt="Siraba Organic" />
+                            <img src="${Logo}" alt="Siraba Organic Logo" class="logo">
+                            <div class="company-info">
+                                <h1>${'Siraba Organic'}</h1>
+                                <div class="company-tagline">Premium Quality Organic Products</div>
+                                <div class="company-contact">
+                                    123 Saffron Valley, Pampore • Kashmir, India 192121<br>
+                                    info@sirabaorganic.com • +91 99066 93633
+                                </div>
+                            </div>
                         </div>
-                        <div class="company-info">
-                            <div class="company-name">Siraba Organic</div>
-                            <div>123 Saffron Valley, Pampore</div>
-                            <div>Kashmir, India 192121</div>
-                            <div>contact@sirabaorganic.com</div>
-                            <div>+91 99066 93633</div>
+                        <div class="invoice-label">
+                            <h2>INVOICE</h2>
+                            <div class="inv-number">#${order._id.slice(-8).toUpperCase()}</div>
                         </div>
                     </div>
 
-                    <div class="invoice-details">
-                        <div class="bill-to">
+                    <div class="detail-cards">
+                        <div class="card">
                             <h3>Bill To</h3>
-                            <p><strong>${order.shippingAddress?.fullName || order.user?.name || 'Customer'}</strong></p>
+                            <p class="highlight">${order.shippingAddress?.name || order.user?.name || 'Customer'}</p>
                             <p>${order.shippingAddress?.address || ''}</p>
-                            <p>${order.shippingAddress?.city || ''} ${order.shippingAddress?.postalCode ? ', ' + order.shippingAddress.postalCode : ''}</p>
-                            <p>${order.shippingAddress?.country || ''}</p>
-                            <p>${order.user?.email || 'N/A'}</p>
+                            <p>${order.shippingAddress?.city || ''}, ${order.shippingAddress?.postalCode || '00000'}</p>
+                            <p>${order.shippingAddress?.country || 'Country'}</p>
                         </div>
-                        <div class="order-meta">
-                            <h3>Invoice Details</h3>
-                            <p><strong>Invoice No:</strong> #${order._id.slice(-8).toUpperCase()}</p>
-                            <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
-                            <p><strong>Order ID:</strong> ${order._id}</p>
-                            <span class="status-badge">${order.status}</span>
+                        <div class="card">
+                            <h3>Invoice Date</h3>
+                            <p class="highlight">${new Date(order.createdAt).toLocaleDateString('en-IN')}</p>
+                            <p style="margin-top: 6px; font-size: 10px; color: #888;">Order ID:</p>
+                            <p style="font-size: 10px; word-break: break-all;">${order._id}</p>
+                        </div>
+                        <div class="card">
+                            <h3>Status</h3>
+                            <span class="status-tag">● ${order.status.toUpperCase()}</span>
                         </div>
                     </div>
 
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Item Description</th>
-                                <th style="text-align: center;">Qty</th>
-                                <th style="text-align: right;">Unit Price</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${order.orderItems.map(item => `
+                    <div class="items-section">
+                        <div class="section-title">Order Items</div>
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td>
-                                        <span class="item-name">${item.name}</span>
-                                        <span class="item-sku">Premium Organic Selection</span>
-                                    </td>
-                                    <td style="text-align: center;">${item.quantity}</td>
-                                    <td style="text-align: right;">₹${item.price.toFixed(2)}</td>
-                                    <td>₹${(item.price * item.quantity).toFixed(2)}</td>
+                                    <th>DESCRIPTION</th>
+                                    <th style="width: 80px; text-align: center;">HSN</th>
+                                    <th style="width: 50px; text-align: center;">QTY</th>
+                                    <th style="width: 90px; text-align: right;">UNIT PRICE</th>
+                                    <th style="width: 90px;">AMOUNT</th>
                                 </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                ${order.orderItems.map(item => `
+                                    <tr>
+                                        <td>
+                                            <div class="product-name">${item.name}</div>
+                                            <div class="product-desc">Premium Organic Selection</div>
+                                        </td>
+                                        <td style="text-align: center; font-size: 11px; color: #666;">${item.hsn || '0909'}</td>
+                                        <td style="text-align: center; font-weight: 700;">${item.quantity}</td>
+                                        <td style="text-align: right;">₹${item.price.toFixed(2)}</td>
+                                        <td style="text-align: right; font-weight: 700; color: #1a4d2e;">₹${(item.price * item.quantity).toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
 
-                    <div class="totals">
+                    <div class="totals-section">
                         <div class="totals-box">
                             <div class="total-row">
                                 <span>Subtotal</span>
@@ -432,17 +639,19 @@ const AdminDashboard = () => {
                                 <span>Shipping</span>
                                 <span>Free</span>
                             </div>
-                            <div class="total-row final">
-                                <span>Grand Total</span>
+                            <div class="total-row grand">
+                                <span>GRAND TOTAL</span>
                                 <span>₹${order.totalPrice.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="footer">
-                        <p>Thank you for choosing Siraba Organic.</p>
-                        <p>For any queries, please contact support.</p>
-                        <div class="auth-sign">Authorized Signatory</div>
+                        <p>Thank you for choosing Siraba Organic. We appreciate your business!<br>
+                        For any queries, please contact our support team.</p>
+                        <div class="signature-section">
+                            <div class="sig-line">Authorized Signatory</div>
+                        </div>
                     </div>
                 </div>
                 <script>
@@ -472,7 +681,7 @@ const AdminDashboard = () => {
             <div className="bg-surface p-6 rounded-sm shadow-sm border border-secondary/10 flex items-center justify-between">
                 <div>
                     <p className="text-text-secondary text-sm font-medium uppercase tracking-wider">Active Orders</p>
-                    <h3 className="text-3xl font-bold text-primary mt-1">{orders.filter(o => o.status !== 'Completed' && o.status !== 'Delivered').length}</h3>
+                    <h3 className="text-3xl font-bold text-primary mt-1">{orders.filter(o => o.status !== 'Shipped').length}</h3>
                 </div>
                 <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
                     <Package size={24} />
@@ -496,8 +705,7 @@ const AdminDashboard = () => {
             'Pending': { color: 'yellow', icon: Clock, step: 1, label: 'Order Placed' },
             'Approved': { color: 'blue', icon: CheckCircle, step: 2, label: 'Confirmed' },
             'Packed': { color: 'purple', icon: PackageCheck, step: 3, label: 'Packed' },
-            'Shipped': { color: 'indigo', icon: Truck, step: 4, label: 'Shipped' },
-            'Delivered': { color: 'green', icon: CheckCircle, step: 5, label: 'Delivered' }
+            'Shipped': { color: 'indigo', icon: Truck, step: 4, label: 'Shipped' }
         };
         return statusMap[status] || statusMap['Pending'];
     };
@@ -616,15 +824,22 @@ const AdminDashboard = () => {
                                                             <option value="Approved">Confirmed</option>
                                                             <option value="Packed">Packed</option>
                                                             <option value="Shipped">Shipped</option>
-                                                            <option value="Delivered">Delivered</option>
                                                         </select>
                                                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-secondary">
                                                             <ChevronDown size={12} />
                                                         </div>
                                                     </div>
                                                     <button
+                                                        onClick={() => downloadInvoice(order._id)}
+                                                        className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 hover:to-yellow-600 text-white px-3 py-1.5 rounded-sm transition-all shadow-sm flex items-center gap-1.5"
+                                                        title="Download Premium Invoice"
+                                                    >
+                                                        <Download size={14} />
+                                                        <span className="text-xs font-bold uppercase tracking-wider">Invoice</span>
+                                                    </button>
+                                                    <button
                                                         onClick={() => handlePrintInvoice(order)}
-                                                        className="bg-white border border-secondary/20 hover:bg-secondary/5 text-text-secondary p-1.5 rounded-sm transition-colors"
+                                                        className="bg-white border border-secondary/20 hover:bg-secondary/5 text-text-secondary p-1.5 rounded-sm transition-colors hidden"
                                                         title="Print Invoice"
                                                     >
                                                         <FileText size={16} />
@@ -763,18 +978,18 @@ const AdminDashboard = () => {
 
     const defaultCards = [
         {
-            title: "Global B2B Solutions",
-            description: "We are having B2B business scenario and accordingly we do offer to you on your requirements and budget. We are flexible to accept orders even for small quantity of the products depends upon country and availability.",
+            title: "India Organic (NPOP)",
+            description: "Certified under the National Programme for Organic Production (NPOP) by APEDA, Ministry of Agriculture & Farmers Welfare, Government of India. This ensures our products meet India's national standards for organic agriculture, processing, and quality control.",
             icon: ""
         },
         {
-            title: "Multiple Certifications",
-            description: "We have multiple organic certificates for organic cultivation, organic processing and handling of organic productions. We adhere to rigorous international standards.",
+            title: "USDA Organic (NOP)",
+            description: "Compliant with United States Department of Agriculture National Organic Program standards. This certification validates our commitment to producing organic products that meet strict USDA requirements for American and international markets.",
             icon: ""
         },
         {
-            title: "Fine Trace Management",
-            description: "We implement the fine trace management in producing. Please contact us if you are refused by other companies because of quantity or complicity of your order.",
+            title: "EU Organic & Kosher",
+            description: "Certified according to European Union Organic Regulations (EC No. 834/2007) and Kosher standards. These certifications ensure our products meet the highest European quality benchmarks and religious dietary requirements.",
             icon: ""
         }
     ];
