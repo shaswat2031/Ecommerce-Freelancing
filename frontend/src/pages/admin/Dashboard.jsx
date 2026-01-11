@@ -1965,32 +1965,81 @@ const AdminDashboard = () => {
                     {/* Sales Trend */}
                     <div className="lg:col-span-2 bg-surface p-6 rounded-sm border border-secondary/10">
                         <h3 className="text-lg font-bold text-primary mb-6">Revenue Trend (7 Days)</h3>
-                        <div className="h-64 flex items-end justify-between gap-4 relative">
-                            {/* Grid Lines */}
-                            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-                                {[0, 1, 2, 3].map(i => <div key={i} className="border-t border-dashed border-secondary/10 w-full h-px"></div>)}
-                            </div>
+                        <div className="h-64 w-full">
+                            {analyticsData.salesByDate?.length > 0 ? (() => {
+                                const data = analyticsData.salesByDate;
+                                const maxVal = Math.max(...data.map(d => d.totalSales), 100); // Min max 100 to avoid div/0 or flat lines
+                                const width = 800;
+                                const height = 250;
+                                const paddingX = 40;
+                                const paddingY = 20;
+                                const graphWidth = width - paddingX * 2;
+                                const graphHeight = height - paddingY * 2;
 
-                            {analyticsData.salesByDate?.length > 0 ? analyticsData.salesByDate.map((day) => {
-                                const height = (day.totalSales / maxSales) * 100;
+                                const points = data.map((d, i) => {
+                                    const x = paddingX + (i / (data.length - 1 || 1)) * graphWidth;
+                                    const y = height - paddingY - (d.totalSales / maxVal) * graphHeight;
+                                    return { x, y, ...d };
+                                });
+
+                                const pathData = points.map((p, i) => (i === 0 ? `M ${p.x},${p.y}` : `L ${p.x},${p.y}`)).join(' ');
+                                const areaPath = `${pathData} L ${points[points.length - 1].x},${height - paddingY} L ${points[0].x},${height - paddingY} Z`;
+
                                 return (
-                                    <div key={day._id} className="flex-1 flex flex-col justify-end group relative items-center">
-                                        <div
-                                            className="w-full bg-primary/90 hover:bg-primary transition-all rounded-t-sm"
-                                            style={{ height: `${Math.max(height, 5)}%` }}
-                                        >
-                                            {/* Tooltip */}
-                                            <div className="absolute opacity-0 group-hover:opacity-100 bottom-full mb-2 bg-primary text-surface text-xs p-2 rounded pointer-events-none whitespace-nowrap z-10">
-                                                <div className="font-bold">{formatPrice(day.totalSales)}</div>
-                                                <div className="text-[10px] opacity-80">{day.count} orders</div>
-                                            </div>
-                                        </div>
-                                        <span className="text-[10px] text-text-secondary mt-2 font-medium">
-                                            {new Date(day._id).toLocaleDateString('en-US', { weekday: 'short' })}
-                                        </span>
-                                    </div>
+                                    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full overflow-visible preserve-3d">
+                                        <defs>
+                                            <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="1">
+                                                <stop offset="0%" stopColor="#1a4d2e" stopOpacity="0.2" />
+                                                <stop offset="100%" stopColor="#1a4d2e" stopOpacity="0" />
+                                            </linearGradient>
+                                        </defs>
+
+                                        {/* Grid Lines (Horizontal) */}
+                                        {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => {
+                                            const y = height - paddingY - ratio * graphHeight;
+                                            return (
+                                                <g key={i}>
+                                                    <line x1={paddingX} y1={y} x2={width - paddingX} y2={y} stroke="#e5e5e5" strokeDasharray="4" />
+                                                    <text x={paddingX - 10} y={y + 4} textAnchor="end" fontSize="10" fill="#999">
+                                                        {formatPrice(ratio * maxVal, true)}
+                                                    </text>
+                                                </g>
+                                            );
+                                        })}
+
+                                        {/* Area Fill */}
+                                        <path d={areaPath} fill="url(#gradient)" />
+
+                                        {/* Line */}
+                                        <path d={pathData} fill="none" stroke="#1a4d2e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+
+                                        {/* Data Points & Tooltips */}
+                                        {points.map((p, i) => (
+                                            <g key={i} className="group cursor-pointer">
+                                                <circle cx={p.x} cy={p.y} r="5" fill="#fff" stroke="#1a4d2e" strokeWidth="2" className="transition-all duration-300 group-hover:r-7" />
+
+                                                {/* Tooltip */}
+                                                <foreignObject x={p.x - 60} y={p.y - 70} width="120" height="60" className="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                                    <div className="bg-primary text-surface p-2 rounded shadow-lg text-center transform scale-90">
+                                                        <div className="text-xs font-bold">{formatPrice(p.totalSales)}</div>
+                                                        <div className="text-[10px] opacity-80">{p.count} orders</div>
+                                                        <div className="text-[10px] font-mono mt-1 border-t border-white/20 pt-1">{new Date(p._id).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' })}</div>
+                                                    </div>
+                                                </foreignObject>
+
+                                                {/* X Axis Label */}
+                                                <text x={p.x} y={height} textAnchor="middle" fontSize="11" fill="#666" className="font-medium">
+                                                    {new Date(p._id).toLocaleDateString('en-US', { weekday: 'short' })}
+                                                </text>
+                                            </g>
+                                        ))}
+                                    </svg>
                                 );
-                            }) : <div className="w-full h-full flex items-center justify-center text-sm text-text-secondary">No recent sales</div>}
+                            })() : (
+                                <div className="w-full h-full flex items-center justify-center text-sm text-text-secondary">
+                                    No sales data available for this period.
+                                </div>
+                            )}
                         </div>
                     </div>
 
