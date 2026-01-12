@@ -50,7 +50,7 @@ const Contact = () => {
                     <div className="space-y-12">
                         <div>
                             <span className="text-accent text-sm tracking-[0.2em] uppercase font-bold">Get In Touch</span>
-                            <h2 className="font-heading text-3xl md:text-4xl text-primary font-bold mt-4 mb-6">Let's start a conversation</h2>
+                            <h2 className="font-heading text-3xl md:text-4xl text-primary font-bold mt-4 mb-6">Contact Siraba Organic</h2>
                             <p className="text-text-secondary text-lg font-light leading-relaxed">
                                 Whether you're curious about our organic farming practices, interested in bulk orders, or just want to say hello, we're here to help.
                             </p>
@@ -59,21 +59,14 @@ const Contact = () => {
                         <div className="space-y-8">
                             <div className="flex items-start space-x-6 group">
                                 <div className="w-12 h-12 bg-surface border border-secondary/10 rounded-sm flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-surface transition-colors duration-300">
-                                    <MapPin size={24} strokeWidth={1.5} />
-                                </div>
-                                <div>
-                                    <h3 className="font-heading text-xl font-bold text-primary mb-2">Visit Us</h3>
-                                    <p className="text-text-secondary font-light">123 Organic Farms Road,<br />Saffron Valley, Pampore,<br />J&K - 192121, India</p>
-                                </div>
-                            </div>
-
-                            <div className="flex items-start space-x-6 group">
-                                <div className="w-12 h-12 bg-surface border border-secondary/10 rounded-sm flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-surface transition-colors duration-300">
                                     <Mail size={24} strokeWidth={1.5} />
                                 </div>
                                 <div>
                                     <h3 className="font-heading text-xl font-bold text-primary mb-2">Email Us</h3>
                                     <p className="text-text-secondary font-light">info@sirabaorganic.com</p>
+                                    <p className="text-text-secondary font-light text-sm mt-1">
+                                        For wholesale/bulk: <br /> Use subject "Bulk Enquiry"
+                                    </p>
                                 </div>
                             </div>
 
@@ -83,8 +76,18 @@ const Contact = () => {
                                 </div>
                                 <div>
                                     <h3 className="font-heading text-xl font-bold text-primary mb-2">Call Us</h3>
-                                    <p className="text-text-secondary font-light">+91 98765 43210</p>
-                                    <p className="text-text-secondary font-light">Mon - Sat, 9am - 6pm</p>
+                                    <p className="text-text-secondary font-light">+91-XXXXXXXXXX</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start space-x-6 group">
+                                <div className="w-12 h-12 bg-surface border border-secondary/10 rounded-sm flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-surface transition-colors duration-300">
+                                    <MapPin size={24} strokeWidth={1.5} />
+                                </div>
+                                <div>
+                                    <h3 className="font-heading text-xl font-bold text-primary mb-2">Suggestions?</h3>
+                                    <p className="text-text-secondary font-light">Write to us at:</p>
+                                    <p className="text-text-secondary font-light">sirabaorganic@gmail.com</p>
                                 </div>
                             </div>
                         </div>

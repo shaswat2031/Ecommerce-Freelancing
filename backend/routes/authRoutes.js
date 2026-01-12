@@ -26,7 +26,8 @@ router.get('/users', protect, admin, async (req, res) => {
                 name: user.name,
                 email: user.email,
                 isAdmin: user.isAdmin,
-                totalOrders: orderCount
+                totalOrders: orderCount,
+                createdAt: user.createdAt
             };
         }));
         res.json(usersWithStats);

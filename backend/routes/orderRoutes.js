@@ -14,12 +14,46 @@ router.post('/', protect, async (req, res) => {
         itemsPrice,
         taxPrice,
         shippingPrice,
-        totalPrice
+        totalPrice,
+        couponCode,
+        discountAmount
     } = req.body;
 
     if (orderItems && orderItems.length === 0) {
         return res.status(400).json({ message: 'No order items' });
     } else {
+        // Handle Coupon Logic
+        if (couponCode) {
+            const Coupon = require('../models/Coupon');
+            const coupon = await Coupon.findOne({ code: couponCode });
+
+            if (!coupon) {
+                return res.status(400).json({ message: 'Invalid coupon code' });
+            }
+
+            const currentDate = new Date();
+
+            if (!coupon.isActive) {
+                return res.status(400).json({ message: 'Coupon is inactive' });
+            }
+
+            if (coupon.expiryDate && new Date() > coupon.expiryDate) {
+                return res.status(400).json({ message: 'Coupon has expired' });
+            }
+
+            if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) {
+                return res.status(400).json({ message: 'Coupon usage limit reached' });
+            }
+
+            if (coupon.assignedTo && coupon.assignedTo.toString() !== req.user._id.toString()) {
+                return res.status(400).json({ message: 'Coupon not valid for this user' });
+            }
+
+            // Apply usage
+            coupon.usedCount += 1;
+            await coupon.save();
+        }
+
         const order = new Order({
             user: req.user._id,
             orderItems,
@@ -28,7 +62,9 @@ router.post('/', protect, async (req, res) => {
             itemsPrice,
             taxPrice,
             shippingPrice,
-            totalPrice
+            totalPrice,
+            couponCode,
+            discountAmount
         });
 
         const createdOrder = await order.save();

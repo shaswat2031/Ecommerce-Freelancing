@@ -81,6 +81,7 @@ app.use('/api/invoices', invoiceRoutes);
 app.use('/api/b2b', require('./routes/b2bRoutes'));
 app.use('/api/settings', require('./routes/settingsRoutes'));
 app.use('/api/contact', require('./routes/contactRoutes'));
+app.use('/api/blogs', require('./routes/blogRoutes'));
 
 app.get('/', (req, res) => {
     res.send('API is running...');

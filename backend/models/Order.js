@@ -21,7 +21,9 @@ const orderSchema = mongoose.Schema({
     paidAt: { type: Date },
     isDelivered: { type: Boolean, required: true, default: false },
     deliveredAt: { type: Date },
-    status: { type: String, default: 'Pending' } // Pending, Approved, Shipped, Delivered
+    status: { type: String, default: 'Pending' }, // Pending, Approved, Shipped, Delivered
+    couponCode: { type: String },
+    discountAmount: { type: Number, default: 0.0 }
 }, {
     timestamps: true
 });

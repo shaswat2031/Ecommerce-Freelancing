@@ -26,9 +26,12 @@ const AdminDashboard = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [couponData, setCouponData] = useState({
         code: '',
+        discountType: 'percentage', // percentage or fixed
         discountValue: '',
         expiryDate: '',
-        maxUses: ''
+        maxUses: '',
+        isActive: true,
+        assignedTo: null // explicit assignment
     });
 
     // B2B State
@@ -255,9 +258,12 @@ const AdminDashboard = () => {
         setSelectedUser(user);
         setCouponData({
             code: user ? `WELCOME-${user.name.split(' ')[0].toUpperCase()}-${Math.floor(Math.random() * 100)}` : '',
+            discountType: 'percentage',
             discountValue: '10',
             expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            maxUses: '1'
+            maxUses: '1',
+            isActive: true,
+            assignedTo: user ? user._id : null
         });
         setIsCouponModalOpen(true);
     };
@@ -268,12 +274,12 @@ const AdminDashboard = () => {
             const payload = {
                 ...couponData,
                 discountValue: parseFloat(couponData.discountValue),
-                discountType: 'percentage',
                 maxUses: parseInt(couponData.maxUses)
             };
-            if (activeTab === 'users' && selectedUser) {
-                payload.assignedTo = selectedUser._id;
-            } else {
+
+            // If assignedTo is set in state (via user selection flow), use it.
+            // If it's empty string or null, remove it from payload to make it general
+            if (!payload.assignedTo) {
                 delete payload.assignedTo;
             }
 
@@ -1067,7 +1073,9 @@ const AdminDashboard = () => {
                                         <span className="text-text-secondary text-xs uppercase">User</span>
                                     }
                                 </td>
-                                <td className="px-6 py-4 text-xs text-text-secondary">{new Date(user.createdAt).toLocaleDateString()}</td>
+                                <td className="px-6 py-4 text-xs text-text-secondary">
+                                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                                </td>
                                 <td className="px-6 py-4">
                                     <button
                                         onClick={() => handleOpenCouponModal(user)}
@@ -2171,6 +2179,7 @@ const AdminDashboard = () => {
                             { id: 'products', icon: Package, label: 'Products' },
                             { id: 'b2b', icon: Truck, label: 'B2B Portal' },
                             { id: 'messages', icon: Mail, label: 'Messages' },
+                            { id: 'blogs', icon: FileText, label: 'Blogs', path: '/admin/blogs' },
                             { id: 'coupons', icon: TicketPercent, label: 'Coupons' },
                             { id: 'reports', icon: ChartIcon, label: 'Analytics' },
                             { id: 'users', icon: Users, label: 'Users' },
@@ -2179,14 +2188,15 @@ const AdminDashboard = () => {
 
                             <button
                                 key={item.id}
-                                onClick={() => setActiveTab(item.id)}
+                                onClick={() => item.path ? window.location.href = item.path : setActiveTab(item.id)}
                                 className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-sm transition-colors
                                     ${activeTab === item.id ? 'bg-primary text-surface' : 'text-text-secondary hover:bg-secondary/5'}`}
                             >
                                 <item.icon size={18} />
                                 {item.label}
                             </button>
-                        ))}
+                        ))
+                        }
                     </nav>
                 </div>
                 <div className="absolute bottom-24 w-full px-6">
@@ -2365,7 +2375,7 @@ const AdminDashboard = () => {
                     <div className="bg-surface w-full max-w-md rounded-sm shadow-xl p-8">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-bold text-primary">
-                                {selectedUser ? `Send Coupon to ${selectedUser.name}` : 'Create New Coupon'}
+                                {couponData.assignedTo ? `Send Coupon to User` : 'Create New Coupon'}
                             </h2>
                             <button onClick={() => setIsCouponModalOpen(false)} className="text-text-secondary hover:text-red-500">
                                 <X size={24} />
@@ -2383,18 +2393,35 @@ const AdminDashboard = () => {
                                     placeholder="SUMMER2026"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-text-secondary mb-1">Discount Percentage (%)</label>
-                                <input
-                                    required
-                                    type="number"
-                                    min="1"
-                                    max="100"
-                                    value={couponData.discountValue}
-                                    onChange={e => setCouponData({ ...couponData, discountValue: e.target.value })}
-                                    className="w-full bg-background border border-secondary/20 p-2 rounded-sm"
-                                />
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-text-secondary mb-1">Type</label>
+                                    <select
+                                        value={couponData.discountType}
+                                        onChange={e => setCouponData({ ...couponData, discountType: e.target.value })}
+                                        className="w-full bg-background border border-secondary/20 p-2 rounded-sm"
+                                    >
+                                        <option value="percentage">Percentage (%)</option>
+                                        <option value="fixed">Fixed Amount (₹)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-text-secondary mb-1">
+                                        {couponData.discountType === 'percentage' ? 'Value (%)' : 'Value (₹)'}
+                                    </label>
+                                    <input
+                                        required
+                                        type="number"
+                                        min="1"
+                                        max={couponData.discountType === 'percentage' ? "100" : undefined}
+                                        value={couponData.discountValue}
+                                        onChange={e => setCouponData({ ...couponData, discountValue: e.target.value })}
+                                        className="w-full bg-background border border-secondary/20 p-2 rounded-sm"
+                                    />
+                                </div>
                             </div>
+
                             <div>
                                 <label className="block text-sm font-medium text-text-secondary mb-1">Expiry Date</label>
                                 <input
@@ -2414,13 +2441,28 @@ const AdminDashboard = () => {
                                     value={couponData.maxUses}
                                     onChange={e => setCouponData({ ...couponData, maxUses: e.target.value })}
                                     className="w-full bg-background border border-secondary/20 p-2 rounded-sm"
-                                    placeholder="Number of times it can be used"
+                                    placeholder="Total usage limit"
                                 />
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    id="isActive"
+                                    checked={couponData.isActive}
+                                    onChange={e => setCouponData({ ...couponData, isActive: e.target.checked })}
+                                    className="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded"
+                                />
+                                <label htmlFor="isActive" className="text-sm font-medium text-text-secondary">
+                                    Active Status
+                                </label>
                             </div>
 
                             <div className="pt-4 flex justify-end gap-3">
                                 <button type="button" onClick={() => setIsCouponModalOpen(false)} className="px-4 py-2 text-sm font-medium text-text-secondary hover:bg-secondary/10 rounded-sm">Cancel</button>
-                                <button type="submit" className="px-6 py-2 text-sm font-bold uppercase tracking-widest bg-primary text-surface hover:bg-accent hover:text-primary transition-colors rounded-sm">Create Coupon</button>
+                                <button type="submit" className="px-6 py-2 text-sm font-bold uppercase tracking-widest bg-primary text-surface hover:bg-accent hover:text-primary transition-colors rounded-sm">
+                                    {couponData.assignedTo ? 'Send Coupon' : 'Create Coupon'}
+                                </button>
                             </div>
                         </form>
                     </div>

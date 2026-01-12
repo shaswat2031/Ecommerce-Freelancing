@@ -4,6 +4,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
+import WhySiraba from './pages/WhySiraba';
+import Blog from './pages/Blog';
 import Certification from './pages/Certification';
 import B2B from './pages/B2B';
 import Account from './pages/Account';
@@ -21,6 +23,9 @@ import Login from './pages/Login';
 import TrackOrder from './pages/TrackOrder';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
+import BlogPost from './pages/BlogPost';
+import AdminBlogList from './pages/admin/AdminBlogList';
+import AdminBlogEdit from './pages/admin/AdminBlogEdit';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import { SocketProvider } from './context/SocketContext';
@@ -57,9 +62,16 @@ function App() {
                                                         <Route path="/shop" element={<Shop />} />
                                                         <Route path="/product/:slug" element={<ProductDetails />} />
                                                         <Route path="/cart" element={<Cart />} />
+
+                                                        <Route path="/our-story" element={<About />} />
                                                         <Route path="/about-us" element={<About />} />
+                                                        <Route path="/why-siraba" element={<WhySiraba />} />
+                                                        <Route path="/certifications" element={<Certification />} />
                                                         <Route path="/certification" element={<Certification />} />
                                                         <Route path="/b2b" element={<B2B />} />
+                                                        <Route path="/blog" element={<Blog />} />
+                                                        <Route path="/blog/:slug" element={<BlogPost />} />
+                                                        <Route path="/contact" element={<Contact />} />
                                                         <Route path="/contact-us" element={<Contact />} />
                                                         <Route path="/account" element={<Account />} />
                                                         <Route path="/login" element={<Login />} />
@@ -72,6 +84,9 @@ function App() {
                                                         {/* Admin Routes */}
                                                         <Route path="/admin" element={<AdminLogin />} />
                                                         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                                                        <Route path="/admin/blogs" element={<AdminBlogList />} />
+                                                        <Route path="/admin/blogs/new" element={<AdminBlogEdit />} />
+                                                        <Route path="/admin/blogs/edit/:id" element={<AdminBlogEdit />} />
 
                                                         {/* Placeholder Routes - To be implemented */}
                                                         <Route path="/saffron" element={<div className="pt-32 text-center h-screen flex items-center justify-center text-xl font-heading text-primary">Saffron Details (Coming Soon)</div>} />

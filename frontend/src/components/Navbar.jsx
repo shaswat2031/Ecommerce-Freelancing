@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Search, Menu, X, User } from 'lucide-react';
+import { ShoppingBag, Search, Menu, X, User, ChevronDown } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useCurrency } from '../context/CurrencyContext';
 import { useCart } from '../context/CartContext';
@@ -10,6 +10,8 @@ const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
+    const [isMobileCurrencyOpen, setIsMobileCurrencyOpen] = useState(false);
+    const [isMobileAboutOpen, setIsMobileAboutOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const searchInputRef = useRef(null);
     const currencyRef = useRef(null);
@@ -128,15 +130,50 @@ const Navbar = () => {
                     <div className="flex-1 flex items-center justify-end md:justify-center px-4 md:px-8 relative">
                         {!isSearchOpen ? (
                             /* Standard Nav Links */
-                            <div className="hidden md:flex items-center space-x-8 lg:space-x-12 animate-fade-in">
-                                {['Shop', 'About Us', 'Certification', 'Contact Us', 'B2B'].map((item) => (
-                                    <Link
-                                        key={item}
-                                        to={`/${item.toLowerCase().replace(/ & /g, '-').replace(' ', '-')}`}
-                                        className="text-text-primary hover:text-accent font-body text-sm uppercase tracking-widest transition-all duration-300 hover:-translate-y-0.5"
-                                    >
-                                        {item}
-                                    </Link>
+                            <div className="hidden md:flex items-center space-x-6 lg:space-x-8 animate-fade-in">
+                                {[
+                                    { label: 'Shop', path: '/shop' },
+                                    {
+                                        label: 'About',
+                                        children: [
+                                            { label: 'Our Story', path: '/our-story' },
+                                            { label: 'Why Siraba', path: '/why-siraba' },
+                                            { label: 'Certifications', path: '/certifications' },
+                                        ]
+                                    },
+                                    { label: 'B2B', path: '/b2b' },
+                                    { label: 'Blog', path: '/blog' },
+                                    { label: 'Contact', path: '/contact' }
+                                ].map((item) => (
+                                    item.children ? (
+                                        <div key={item.label} className="relative group">
+                                            <button className="flex items-center gap-1 text-text-primary hover:text-accent font-body text-xs lg:text-sm uppercase tracking-widest transition-all duration-300 py-2">
+                                                {item.label}
+                                                <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-300" />
+                                            </button>
+                                            <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 w-48 z-50">
+                                                <div className="bg-surface shadow-xl rounded-sm border border-secondary/10 overflow-hidden py-1">
+                                                    {item.children.map(child => (
+                                                        <Link
+                                                            key={child.label}
+                                                            to={child.path}
+                                                            className="block px-4 py-2 text-text-primary hover:text-accent hover:bg-secondary/5 font-body text-xs uppercase tracking-wider transition-colors text-center"
+                                                        >
+                                                            {child.label}
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <Link
+                                            key={item.label}
+                                            to={item.path}
+                                            className="text-text-primary hover:text-accent font-body text-xs lg:text-sm uppercase tracking-widest transition-all duration-300 hover:-translate-y-0.5 whitespace-nowrap"
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    )
                                 ))}
                             </div>
                         ) : (
@@ -285,30 +322,82 @@ const Navbar = () => {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" size={16} />
                     </div>
                     <div className="border-t border-secondary/10 mt-2 pt-2">
-                        <p className="px-3 text-xs font-bold text-text-secondary uppercase mb-1">Currency</p>
-                        <div className="flex flex-wrap gap-2 px-3">
-                            {availableCurrencies.map(curr => (
-                                <button
-                                    key={curr}
-                                    onClick={() => { setCurrency(curr); setIsOpen(false); }}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold border transition-all ${currency === curr ? 'bg-accent text-primary border-accent shadow-sm' : 'bg-transparent text-text-secondary border-secondary/20 hover:border-accent/50'}`}
-                                >
-                                    <span className="text-sm">{currencySymbols[curr]}</span>
-                                    <span>{curr}</span>
-                                </button>
-                            ))}
-                        </div>
+                        <button
+                            onClick={() => setIsMobileCurrencyOpen(!isMobileCurrencyOpen)}
+                            className="flex items-center justify-between w-full px-3 py-2 text-primary font-bold hover:bg-secondary/5 rounded-md transition-colors"
+                        >
+                            <span className="text-sm uppercase tracking-wider">Currency: {currency}</span>
+                            <span className={`transition-transform duration-200 ${isMobileCurrencyOpen ? 'rotate-180' : ''}`}>▼</span>
+                        </button>
+
+                        {isMobileCurrencyOpen && (
+                            <div className="grid grid-cols-3 gap-2 px-3 mt-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-primary/20">
+                                {availableCurrencies.map(curr => (
+                                    <button
+                                        key={curr}
+                                        onClick={() => { setCurrency(curr); setIsMobileCurrencyOpen(false); setIsOpen(false); }}
+                                        className={`flex flex-col items-center justify-center p-2 rounded-md border text-xs transition-all ${currency === curr ? 'bg-accent text-primary border-accent shadow-sm' : 'bg-surface text-text-secondary border-secondary/20 hover:border-accent/50 hover:text-primary'}`}
+                                    >
+                                        <span className="text-sm font-bold">{currencySymbols[curr]}</span>
+                                        <span className="text-[10px] uppercase">{curr}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className="px-4 pt-2 pb-6 space-y-2">
-                    {['Shop', 'Track Order', 'About Us', 'Certification', 'Contact Us'].map((item) => (
+                    {/* Shop */}
+                    <Link
+                        to="/shop"
+                        className="block px-3 py-3 text-base font-medium text-primary hover:bg-secondary/10 hover:text-accent rounded-md transition-colors"
+                        onClick={() => setIsOpen(false)}
+                    >
+                        Shop
+                    </Link>
+
+                    {/* About Dropdown */}
+                    <div>
+                        <button
+                            onClick={() => setIsMobileAboutOpen(!isMobileAboutOpen)}
+                            className="flex items-center justify-between w-full px-3 py-3 text-base font-medium text-primary hover:bg-secondary/10 hover:text-accent rounded-md transition-colors"
+                        >
+                            <span>About</span>
+                            <ChevronDown size={16} className={`transition-transform duration-300 ${isMobileAboutOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        <div className={`overflow-hidden transition-all duration-300 ${isMobileAboutOpen ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'}`}>
+                            <div className="pl-6 space-y-1 py-1">
+                                {[
+                                    { label: 'Our Story', path: '/our-story' },
+                                    { label: 'Why Siraba', path: '/why-siraba' },
+                                    { label: 'Certifications', path: '/certifications' }
+                                ].map(child => (
+                                    <Link
+                                        key={child.label}
+                                        to={child.path}
+                                        onClick={() => setIsOpen(false)}
+                                        className="block px-3 py-2 text-sm text-text-secondary hover:text-accent transition-colors"
+                                    >
+                                        {child.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {[
+                        { label: 'B2B', path: '/b2b' },
+                        { label: 'Blog', path: '/blog' },
+                        { label: 'Contact', path: '/contact' },
+                        { label: 'Track Order', path: '/track-order' }
+                    ].map((item) => (
                         <Link
-                            key={item}
-                            to={`/${item.toLowerCase().replace(/ & /g, '-').replace(' ', '-')}`}
+                            key={item.label}
+                            to={item.path}
                             className="block px-3 py-3 text-base font-medium text-primary hover:bg-secondary/10 hover:text-accent rounded-md transition-colors"
                             onClick={() => setIsOpen(false)}
                         >
-                            {item}
+                            {item.label}
                         </Link>
                     ))}
                     <Link

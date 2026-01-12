@@ -134,8 +134,8 @@ const Checkout = () => {
             taxPrice,
             shippingPrice,
             totalPrice,
-            // We can add discount info to backend later if needed
-            // discountAmount: discount.amount, 
+            couponCode: discount.code,
+            discountAmount: discount.amount,
         };
 
         try {

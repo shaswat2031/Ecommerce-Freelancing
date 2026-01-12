@@ -20,22 +20,24 @@ const Footer = () => {
                     </div>
 
                     <div className="space-y-4">
-                        <h4 className="font-heading font-bold text-lg text-primary">Quick Links</h4>
-                        <ul className="space-y-2 text-sm text-text-secondary">
-                            <li><Link to="/about" className="hover:text-accent transition-colors">Our Story</Link></li>
-                            <li><Link to="/shop" className="hover:text-accent transition-colors">Shop</Link></li>
-                            <li><Link to="/b2b" className="hover:text-accent transition-colors">B2B & Exports</Link></li>
-                            <li><Link to="/certifications" className="hover:text-accent transition-colors">Certifications</Link></li>
+                        <h4 className="font-heading text-lg mb-6 text-accent">Menu</h4>
+                        <ul className="space-y-3 text-sm font-light text-white/80">
+                            <li><Link to="/" className="hover:text-accent transition-colors">Home</Link></li>
+                            <li><Link to="/shop" className="hover:text-accent transition-colors">Our Products</Link></li>
+                            <li><Link to="/b2b" className="hover:text-accent transition-colors">B2B Trade</Link></li>
+                            <li><Link to="/account" className="hover:text-accent transition-colors">My Account</Link></li>
                             <li><Link to="/track-order" className="hover:text-accent transition-colors">Track Order</Link></li>
                         </ul>
                     </div>
 
-                    <div>
-                        <h4 className="font-heading text-lg mb-6 text-accent">Company</h4>
-                        <ul className="space-y-4 text-sm font-light text-white/80">
-                            <li><a href="#" className="hover:text-accent transition-colors">Our Story</a></li>
-                            <li><a href="#" className="hover:text-accent transition-colors">Certifications</a></li>
-                            <li><a href="#" className="hover:text-accent transition-colors">Sustainability</a></li>
+                    <div className="space-y-4">
+                        <h4 className="font-heading text-lg mb-6 text-accent">Explore</h4>
+                        <ul className="space-y-3 text-sm font-light text-white/80">
+                            <li><Link to="/our-story" className="hover:text-accent transition-colors">Our Story</Link></li>
+                            <li><Link to="/why-siraba" className="hover:text-accent transition-colors">Why Siraba</Link></li>
+                            <li><Link to="/certifications" className="hover:text-accent transition-colors">Certifications</Link></li>
+                            <li><Link to="/blog" className="hover:text-accent transition-colors">Blog</Link></li>
+                            <li><Link to="/contact" className="hover:text-accent transition-colors">Contact Us</Link></li>
                         </ul>
                     </div>
                 </div>

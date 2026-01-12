@@ -3,9 +3,7 @@ const router = express.Router();
 const Coupon = require('../models/Coupon');
 const { protect, admin } = require('../middleware/authMiddleware');
 
-// @desc    Create a new coupon
-// @route   POST /api/coupons
-// @access  Private/Admin
+
 router.post('/', protect, admin, async (req, res) => {
     try {
         const { code, discountType, discountValue, assignedTo, expiryDate, maxUses } = req.body;

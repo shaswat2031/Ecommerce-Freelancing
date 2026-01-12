@@ -5,6 +5,8 @@ import { useCart } from '../context/CartContext';
 import { useProducts } from '../context/ProductContext';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
+import SaffronImage from '../assets/saffron.png';
+import HingImage from '../assets/hing.png';
 
 const Shop = () => {
     const { addToCart } = useCart();
@@ -84,11 +86,145 @@ const Shop = () => {
     return (
         <div className="w-full pt-20 bg-background min-h-screen">
             {/* Header */}
-            <div className="bg-primary pt-16 pb-12 px-4 text-center text-surface">
-                <h1 className="font-heading text-4xl md:text-5xl font-bold tracking-wide mb-4">Shop Premium Organics</h1>
-                <p className="text-white/80 font-light max-w-2xl mx-auto text-lg">
-                    Discover our exclusive collection of certified organic treasures. Directly from farm to your home.
-                </p>
+            {/* Flagship Products Showcase */}
+            <div className="w-full">
+                {/* Saffron Section */}
+                <section className="relative py-20 px-4 bg-primary text-surface overflow-hidden">
+                    <div className="absolute top-0 right-0 w-1/2 h-full bg-surface/5 transform skew-x-12 translate-x-1/4"></div>
+                    <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-12 items-center relative z-10">
+                        <div className="w-full md:w-1/2 space-y-6">
+                            <span className="inline-block py-1 px-3 border border-accent rounded-full text-accent text-xs font-bold uppercase tracking-widest">
+                                🌿 Flagship Product
+                            </span>
+                            <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+                                Kashmiri Saffron <span className="text-2xl text-accent font-normal block mt-2 font-body italic">(Kesar)</span>
+                            </h2>
+                            <h3 className="text-xl md:text-2xl text-white/90 font-light font-heading">
+                                The World’s Most Precious Spice — Verified for Purity
+                            </h3>
+                            <p className="text-white/80 leading-relaxed font-light text-lg">
+                                Hand-harvested from the high-altitude valleys of Kashmir, Siraba Organic Kashmiri Saffron represents the gold standard of saffron worldwide. Known for its deep crimson stigmas, rich aroma, and extraordinary potency, it is prized by gourmet chefs, wellness brands, and premium households across the globe.
+                            </p>
+                            <p className="text-white/80 leading-relaxed font-light text-sm italic border-l-2 border-accent pl-4">
+                                Our saffron is carefully selected, graded, and processed under strict quality controls to preserve its natural strength, color, and therapeutic value.
+                            </p>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-6">
+                                <div>
+                                    <h4 className="text-accent font-bold uppercase tracking-wider text-xs mb-3">Key Characteristics</h4>
+                                    <ul className="space-y-2 text-sm text-white/70 font-light">
+                                        <li className="flex items-start gap-2">• Deep red, hand-picked stigmas</li>
+                                        <li className="flex items-start gap-2">• Naturally high levels of crocin, safranal & picrocrocin</li>
+                                        <li className="flex items-start gap-2">• Globally accredited laboratory tested for purity</li>
+                                        <li className="flex items-start gap-2">• No artificial coloring, no fillers, no additives</li>
+                                        <li className="flex items-start gap-2">• Certified organic and export compliant</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 className="text-accent font-bold uppercase tracking-wider text-xs mb-3">Used globally for</h4>
+                                    <ul className="space-y-2 text-sm text-white/70 font-light">
+                                        <li className="flex items-start gap-2">• Gourmet and fine-dining cuisine</li>
+                                        <li className="flex items-start gap-2">• Herbal and nutraceutical formulations</li>
+                                        <li className="flex items-start gap-2">• Wellness, beauty, and skincare products</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div className="pt-6">
+                                <button
+                                    onClick={() => {
+                                        setFilters(prev => ({ ...prev, category: 'Saffron' }));
+                                        // Scroll to product grid
+                                        window.scrollTo({ top: document.getElementById('product-grid').offsetTop - 100, behavior: 'smooth' });
+                                    }}
+                                    className="bg-accent text-primary px-8 py-4 font-bold uppercase tracking-widest hover:bg-white transition-colors duration-300 shadow-lg"
+                                >
+                                    Explore Kashmiri Saffron
+                                </button>
+                            </div>
+                        </div>
+                        <div className="w-full md:w-1/2 relative group">
+                            {/* Saffron Image */}
+                            <div className="aspect-[3/4] w-full max-w-md relative rounded-2xl border border-white/10 overflow-hidden shadow-2xl mx-auto">
+                                <div className="absolute inset-0 bg-accent/20 animate-pulse-slow"></div>
+                                <img
+                                    src={SaffronImage}
+                                    alt="Kashmiri Saffron"
+                                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                />
+                                <span className="absolute -bottom-10 -right-4 font-heading text-8xl text-white/10 font-bold z-10 select-none pointer-events-none">KESAR</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Hing Section */}
+                <section className="relative py-20 px-4 bg-background text-primary overflow-hidden border-b border-secondary/10">
+                    <div className="max-w-7xl mx-auto flex flex-col md:flex-row-reverse gap-12 items-center relative z-10">
+                        <div className="w-full md:w-1/2 space-y-6">
+                            <span className="inline-block py-1 px-3 border border-primary/20 rounded-full text-primary/70 text-xs font-bold uppercase tracking-widest">
+                                🌿 Flagship Product
+                            </span>
+                            <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+                                Premium Asafoetida <span className="text-2xl text-text-secondary font-normal block mt-2 font-body italic">(Hing)</span>
+                            </h2>
+                            <h3 className="text-xl md:text-2xl text-text-secondary font-light font-heading">
+                                India’s Finest Export-Grade Hing — Trusted Worldwide
+                            </h3>
+                            <p className="text-text-secondary leading-relaxed font-light text-lg">
+                                India is the undisputed global center for high-quality compounded and processed asafoetida — and Siraba Organic delivers the finest expression of it.
+                            </p>
+                            <p className="text-text-secondary leading-relaxed font-light text-sm italic border-l-2 border-primary pl-4">
+                                Our Premium Hing is formulated using food-grade organic standards, ensuring purity, safety, and consistency for both household and professional use. Known for its powerful aroma, digestive benefits, and distinctive flavor, Siraba Hing is trusted by kitchens and food processors worldwide.
+                            </p>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-6">
+                                <div>
+                                    <h4 className="text-primary font-bold uppercase tracking-wider text-xs mb-3">Key Characteristics</h4>
+                                    <ul className="space-y-2 text-sm text-text-secondary font-light">
+                                        <li className="flex items-start gap-2">• Food-grade compounded asafoetida</li>
+                                        <li className="flex items-start gap-2">• Free from harmful fillers and adulterants</li>
+                                        <li className="flex items-start gap-2">• Certified organic and export compliant</li>
+                                        <li className="flex items-start gap-2">• Ideal for culinary, wellness, and traditional medicinal use</li>
+                                        <li className="flex items-start gap-2">• Batch-tested and quality controlled</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 className="text-primary font-bold uppercase tracking-wider text-xs mb-3">Trusted by</h4>
+                                    <ul className="space-y-2 text-sm text-text-secondary font-light">
+                                        <li className="flex items-start gap-2">• Home chefs & Gourmet kitchens</li>
+                                        <li className="flex items-start gap-2">• Global food brands</li>
+                                        <li className="flex items-start gap-2">• Ayurvedic and wellness industries</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div className="pt-6">
+                                <button
+                                    onClick={() => {
+                                        setFilters(prev => ({ ...prev, category: 'Hing' }));
+                                        window.scrollTo({ top: document.getElementById('product-grid').offsetTop - 100, behavior: 'smooth' });
+                                    }}
+                                    className="bg-primary text-surface px-8 py-4 font-bold uppercase tracking-widest hover:bg-accent hover:text-primary transition-colors duration-300 shadow-lg"
+                                >
+                                    Explore Premium Hing
+                                </button>
+                            </div>
+                        </div>
+                        <div className="w-full md:w-1/2 relative group">
+                            {/* Hing Image */}
+                            <div className="aspect-[3/4] w-full max-w-md relative rounded-2xl border border-primary/10 overflow-hidden shadow-2xl mx-auto">
+                                <div className="absolute inset-0 bg-primary/5 animate-pulse-slow"></div>
+                                <img
+                                    src={HingImage}
+                                    alt="Premium Asafoetida"
+                                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                />
+                                <span className="absolute -bottom-10 -left-4 font-heading text-8xl text-primary/10 font-bold z-10 select-none pointer-events-none">HING</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
 
             {/* Mobile Filter Toggle */}
@@ -99,7 +235,7 @@ const Shop = () => {
                 </button>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16">
+            <div id="product-grid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16">
                 <div className="flex flex-col md:flex-row gap-8">
 
                     {/* Sidebar / Filters */}

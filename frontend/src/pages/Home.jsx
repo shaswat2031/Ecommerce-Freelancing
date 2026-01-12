@@ -6,6 +6,7 @@ import SaffronImg from '../assets/Saffron.png';
 import HingImg from '../assets/Hing.png';
 import BgImage2 from '../assets/bgimage2.png';
 import BgImage1 from '../assets/bgimage1.png'; // Fallback or extra usage
+import TextMarquee from '../components/TextMarquee';
 
 const Home = () => {
     const { homeContent, products } = useProducts();
@@ -40,28 +41,33 @@ const Home = () => {
                 </div>
 
                 <div className="relative z-10 text-center px-4 max-w-5xl mx-auto space-y-6 md:space-y-8 animate-fade-in-up">
-                    <span className="font-subheading text-accent text-lg md:text-xl tracking-[0.2em] uppercase font-bold text-shadow-sm">
-                        Pure • Rare • Certified
+                    <span className="font-subheading text-accent text-xs md:text-sm tracking-[0.15em] uppercase font-bold text-shadow-sm border border-accent/30 px-4 py-2 rounded-full bg-black/20 backdrop-blur-sm mb-4">
+                        USDA Organic • NPOP Certified • Globally Certified • Export-Ready
                     </span>
-                    <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl text-surface leading-tight text-shadow">
-                        The Red Gold <br /> of Kashmir
+                    <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl text-surface leading-tight text-shadow max-w-6xl mx-auto">
+                        World’s Finest Organic Kashmiri Saffron (Keshar) <span className="italic text-accent">&</span> Premium Asafetida (Hing)
                     </h1>
-                    <p className="font-body text-white/90 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed">
-                        Experience the world's finest Grade A1 organic saffron. <br className="hidden md:block" />
-                        Directly from the heritage farms of Pampore to your kitchen.
+                    <p className="font-body text-white/90 text-base md:text-lg max-w-3xl mx-auto font-light leading-relaxed">
+                        From the pristine valleys of Kashmir to certified Indian spice laboratories, Siraba Organic delivers globally trusted, lab-verified, premium organic ingredients to conscious kitchens worldwide.
                     </p>
-                    <div className="flex flex-col md:flex-row items-center justify-center gap-4 pt-4">
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-4 pt-6">
                         <Link
-                            to="/shop"
-                            className="bg-accent text-primary font-medium text-sm tracking-widest uppercase px-10 py-4 hover:bg-surface transition-all duration-300 transform hover:-translate-y-1 shadow-lg"
+                            to="/shop?category=Saffron"
+                            className="bg-accent text-primary font-bold text-sm tracking-widest uppercase px-8 py-4 hover:bg-surface transition-all duration-300 transform hover:-translate-y-1 shadow-lg w-full md:w-auto"
                         >
-                            Shop Collection
+                            Shop Saffron
                         </Link>
                         <Link
-                            to="/our-story"
-                            className="group flex items-center gap-2 text-surface font-light tracking-wide hover:text-accent transition-colors duration-300"
+                            to="/shop?category=Hing"
+                            className="bg-primary text-surface border border-accent/50 font-bold text-sm tracking-widest uppercase px-8 py-4 hover:bg-surface hover:text-primary transition-all duration-300 transform hover:-translate-y-1 shadow-lg w-full md:w-auto"
                         >
-                            Our Heritage <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                            Shop Hing
+                        </Link>
+                        <Link
+                            to="/b2b"
+                            className="bg-white/10 backdrop-blur text-surface border border-white/20 font-bold text-sm tracking-widest uppercase px-8 py-4 hover:bg-surface hover:text-primary transition-all duration-300 transform hover:-translate-y-1 shadow-lg w-full md:w-auto"
+                        >
+                            Wholesale Enquiry
                         </Link>
                     </div>
                 </div>
@@ -102,12 +108,15 @@ const Home = () => {
                 </div>
             </section>
 
+            {/* Moving Text Banner */}
+            <TextMarquee />
+
             {/* Featured Products */}
             <section className="py-20 md:py-32 bg-surface">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16 space-y-4">
-                        <span className="text-accent text-sm tracking-[0.2em] uppercase font-bold">{homeContent.subheading}</span>
-                        <h2 className="font-heading text-4xl md:text-5xl text-primary">{homeContent.heading}</h2>
+                        <span className="text-accent text-sm tracking-[0.2em] uppercase font-bold">Curated Excellence</span>
+                        <h2 className="font-heading text-4xl md:text-5xl text-primary">Signature Collection</h2>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
@@ -136,97 +145,33 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Customer Reviews */}
-            <section className="py-20 bg-background border-t border-secondary/10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-12">
-                        <span className="text-accent text-sm tracking-[0.2em] uppercase font-bold">Testimonials</span>
-                        <h2 className="font-heading text-3xl md:text-4xl text-primary mt-2">Loved by Our Customers</h2>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="bg-white p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow duration-300 space-y-6">
-                            <div className="flex text-accent gap-1">
-                                <Star size={16} fill="currentColor" />
-                                <Star size={16} fill="currentColor" />
-                                <Star size={16} fill="currentColor" />
-                                <Star size={16} fill="currentColor" />
-                                <Star size={16} fill="currentColor" />
-                            </div>
-                            <p className="text-text-secondary text-base italic leading-relaxed">
-                                "The aroma is incredible. Just a few strands are enough for my Biryani. The quality is visibly superior to what I find in supermarkets."
-                            </p>
-                            <div className="flex items-center gap-3 pt-4 border-t border-secondary/10">
-                                <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center text-primary font-bold text-xs">PS</div>
-                                <div>
-                                    <p className="font-heading font-bold text-primary text-sm">Priya Sharma</p>
-                                    <p className="text-xs text-text-secondary">Verified Buyer</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="bg-white p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow duration-300 space-y-6">
-                            <div className="flex text-accent gap-1">
-                                <Star size={16} fill="currentColor" />
-                                <Star size={16} fill="currentColor" />
-                                <Star size={16} fill="currentColor" />
-                                <Star size={16} fill="currentColor" />
-                                <Star size={16} fill="currentColor" />
-                            </div>
-                            <p className="text-text-secondary text-base italic leading-relaxed">
-                                "I use this for my daily saffron tea. The color release is instant and beautiful golden. Absolutely worth the price for this purity."
-                            </p>
-                            <div className="flex items-center gap-3 pt-4 border-t border-secondary/10">
-                                <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center text-primary font-bold text-xs">RM</div>
-                                <div>
-                                    <p className="font-heading font-bold text-primary text-sm">Rahul Mehta</p>
-                                    <p className="text-xs text-text-secondary">Verified Buyer</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="bg-white p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow duration-300 space-y-6">
-                            <div className="flex text-accent gap-1">
-                                <Star size={16} fill="currentColor" />
-                                <Star size={16} fill="currentColor" />
-                                <Star size={16} fill="currentColor" />
-                                <Star size={16} fill="currentColor" />
-                                <Star size={16} fill="currentColor" />
-                            </div>
-                            <p className="text-text-secondary text-base italic leading-relaxed">
-                                "Fast delivery and beautiful premium packaging. It feels like a luxury gift. I ordered for my mother and she loved it."
-                            </p>
-                            <div className="flex items-center gap-3 pt-4 border-t border-secondary/10">
-                                <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center text-primary font-bold text-xs">SJ</div>
-                                <div>
-                                    <p className="font-heading font-bold text-primary text-sm">Sarah Jenkins</p>
-                                    <p className="text-xs text-text-secondary">Verified Buyer</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
-            {/* Story Section */}
+
+            {/* Customer Trust & CTA Section */}
             <section className="py-20 md:py-32 bg-primary text-surface relative overflow-hidden">
-                {/* Background Image */}
                 <div className="absolute inset-0 z-0 opacity-20">
                     <img src={BgImage2} alt="Background" className="w-full h-full object-cover" />
                 </div>
-                {/* Gradient Overlay */}
                 <div className="absolute inset-0 z-0 bg-gradient-to-b from-primary/90 via-primary/80 to-primary/90"></div>
 
                 <div className="max-w-4xl mx-auto px-4 text-center relative z-10 space-y-8">
-                    <div className="inline-block border border-accent/30 p-8 rounded-full mb-4 backdrop-blur-sm">
-                        <span className="font-heading text-6xl text-accent">“</span>
-                    </div>
-                    <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl leading-tight">
-                        We believe true luxury lies in <span className="text-accent italic">purity</span> and <span className="text-accent italic">origin</span>.
+                    <span className="text-accent text-sm tracking-[0.2em] uppercase font-bold">Customer Trust & CTA</span>
+                    <h2 className="font-heading text-4xl md:text-6xl leading-tight font-bold">
+                        Bring Real Organic Into Your Kitchen
                     </h2>
                     <p className="text-lg md:text-xl font-light text-white/80 leading-relaxed max-w-3xl mx-auto">
-                        Siraba Organic was born from a desire to preserve the ancient wisdom of Indian agriculture. Every strand of our saffron tells a story of the soil, the hands that tended it, and the pristine Himalayan air that nurtured it.
+                        Across the world, families, chefs, and wellness-conscious consumers choose Siraba Organic for one simple reason — <span className="text-accent italic">they trust what they eat.</span>
                     </p>
-                    <div className="pt-8">
-                        <Link to="/our-story" className="text-accent hover:text-white border-b border-accent pb-1 transition-colors duration-300 font-medium tracking-wide uppercase text-sm">
-                            Read Our Full Story
+                    <p className="text-base md:text-lg font-light text-white/70 leading-relaxed max-w-3xl mx-auto">
+                        Our Kashmiri Saffron and Premium Hing are sourced, tested, and packaged with a level of care that mass-market brands cannot match. Every batch reflects our promise of purity, authenticity, and global-grade quality.
+                    </p>
+
+                    <div className="pt-8 flex flex-col sm:flex-row items-center justify-center gap-6">
+                        <Link to="/shop?category=Saffron" className="w-full sm:w-auto bg-accent text-primary px-10 py-4 font-bold uppercase tracking-widest hover:bg-surface transition-all duration-300 shadow-lg transform hover:-translate-y-1">
+                            Shop Kashmiri Saffron
+                        </Link>
+                        <Link to="/shop?category=Hing" className="w-full sm:w-auto bg-transparent border border-accent text-surface px-10 py-4 font-bold uppercase tracking-widest hover:bg-accent hover:text-primary transition-all duration-300 shadow-lg transform hover:-translate-y-1">
+                            Shop Premium Hing
                         </Link>
                     </div>
                 </div>
