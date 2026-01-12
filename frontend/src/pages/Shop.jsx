@@ -5,8 +5,8 @@ import { useCart } from '../context/CartContext';
 import { useProducts } from '../context/ProductContext';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
-import SaffronImage from '../assets/saffron.png';
-import HingImage from '../assets/hing.png';
+import SaffronImage from '../assets/Saffron.png';
+import HingImage from '../assets/Hing.png';
 
 const Shop = () => {
     const { addToCart } = useCart();
