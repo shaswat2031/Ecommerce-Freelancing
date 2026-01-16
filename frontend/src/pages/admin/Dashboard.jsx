@@ -4680,10 +4680,11 @@ const AdminDashboard = () => {
 
       {/* Sidebar */}
       <aside
-        className={`w-64 bg-surface border-r border-secondary/10 fixed h-full left-0 top-20 z-20 transition-transform duration-300 ease-in-out md:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`w-64 bg-surface border-r border-secondary/10 fixed left-0 top-20 z-20 transition-transform duration-300 ease-in-out md:translate-x-0 flex flex-col ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
+        style={{ height: 'calc(100vh - 5rem)' }}
       >
-        <div className="p-6">
+        <div className="p-6 flex-1 overflow-y-auto">
           <div className="flex items-center gap-3 text-primary mb-8">
             <Settings size={24} />
             <span className="font-heading font-bold text-xl">Admin</span>
@@ -4730,7 +4731,7 @@ const AdminDashboard = () => {
             ))}
           </nav>
         </div>
-        <div className="absolute bottom-24 w-full px-6">
+        <div className="p-6 border-t border-secondary/10 bg-surface">
           <button
             onClick={logout}
             className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 rounded-sm transition-colors"
