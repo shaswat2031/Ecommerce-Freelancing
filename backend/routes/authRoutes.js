@@ -114,6 +114,9 @@ router.put('/profile', protect, async (req, res) => {
             if (req.body.addresses) {
                 user.addresses = req.body.addresses;
             }
+            if (req.body.notificationPreferences) {
+                user.notificationPreferences = req.body.notificationPreferences;
+            }
 
             const updatedUser = await user.save();
 
@@ -162,6 +165,24 @@ router.post('/wishlist/:id', protect, async (req, res) => {
             user.wishlist.push(productId);
             await user.save();
             res.json({ message: 'Product added to wishlist', wishlist: user.wishlist });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// @desc    Delete user account
+// @route   DELETE /api/auth/profile
+// @access  Private
+router.delete('/profile', protect, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+
+        if (user) {
+            await user.deleteOne();
+            res.json({ message: 'User removed' });
+        } else {
+            res.status(404).json({ message: 'User not found' });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });

@@ -16,6 +16,9 @@ const orderSchema = mongoose.Schema({
         country: { type: String }
     },
     paymentMethod: { type: String, default: 'COD' }, // Default for now
+    itemsPrice: { type: Number, required: true, default: 0.0 },
+    taxPrice: { type: Number, required: true, default: 0.0 },
+    shippingPrice: { type: Number, required: true, default: 0.0 },
     totalPrice: { type: Number, required: true, default: 0.0 },
     isPaid: { type: Boolean, required: true, default: false },
     paidAt: { type: Date },
@@ -23,7 +26,17 @@ const orderSchema = mongoose.Schema({
     deliveredAt: { type: Date },
     status: { type: String, default: 'Pending' }, // Pending, Approved, Shipped, Delivered
     couponCode: { type: String },
-    discountAmount: { type: Number, default: 0.0 }
+    discountAmount: { type: Number, default: 0.0 },
+    returnStatus: {
+        type: String,
+        enum: ['None', 'Requested', 'Approved', 'Rejected', 'Returned', 'Refunded', 'Pending', 'Processing', 'Completed'],
+        default: 'None'
+    },
+    returnReason: { type: String },
+    returnRequestedAt: { type: Date },
+    isRefunded: { type: Boolean, default: false },
+    refundAmount: { type: Number, default: 0 },
+    refundDate: { type: Date }
 }, {
     timestamps: true
 });

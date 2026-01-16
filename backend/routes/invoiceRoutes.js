@@ -51,10 +51,10 @@ const generateInvoiceHTML = async (order) => {
             price: `₹${(item.price || 0).toFixed(2)}`,
             total: `₹${((item.price || 0) * item.quantity).toFixed(2)}`
         })),
-        subtotal: `₹${totalPrice.toFixed(2)}`,
-        tax: '₹0.00',
+        subtotal: `₹${(order.itemsPrice || 0).toFixed(2)}`,
+        tax: `₹${(order.taxPrice || 0).toFixed(2)}`,
         shipping: shippingPrice > 0 ? `₹${shippingPrice.toFixed(2)}` : 'Free',
-        grandTotal: `₹${(totalPrice + shippingPrice).toFixed(2)}`
+        grandTotal: `₹${(order.totalPrice || 0).toFixed(2)}`
     };
 
     // Compile template with Handlebars

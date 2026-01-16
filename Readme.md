@@ -107,3 +107,38 @@ The Journal (Blog):
 Why: Organic brands rely on education. Articles like "Benefits of Kashmiri Saffron" or "Farm to Table Stories" build trust and SEO.
 Recipes Page: Showing how to use the products (e.g., "Saffron Milk Recipe").
 Sustainability / Our Farm: A visual-heavy page showing the actual fields, farmers, and organic certification process.
+
+## 📊 Financial Logic Verification
+
+### 1. Manual Order Breakdown (Admin Perspective)
+This table breaks down the recent orders to verify the "Total Revenue" and "Admin Balance" calculations.
+
+| Order ID | Status | Gross Sales (GMV) | Refund to User | Delivery/Tax (Retained) | Admin Commission (if applicable) | Vendor Payout | **Net Admin Impact** |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **#a1c6dfc9** | Returned | ₹5,097.46 | -₹4,598.46 | ₹499.00 | ₹194.85 (Reversed) | ₹0.00 | **+₹499.00** |
+| **#725a6aff** | Returned | ₹2,031.82 | -₹1,532.82 | ₹499.00 | ₹64.95 (Reversed) | ₹0.00 | **+₹499.00** |
+| **Vendor Payout** | Completed | - | - | - | - | -₹600.00 | **-₹600.00** |
+| **TOTALS** | | **₹7,129.28** | **-₹6,131.28** | **₹998.00** | | **-₹600.00** | **₹398.00** |
+
+> **Note:** "Gross Sales" includes ALL orders (Start of funnel). "Admin Balance" is the Cash-in-hand after refunds and payouts.
+
+### 2. Admin Dashboard Metrics Verification
+
+| Metric | Dashboard Logic | Calculation Based on Above Data | Result |
+| :--- | :--- | :--- | :--- |
+| **Total Revenue** | Sum of `totalPrice` for non-cancelled orders | ₹5,097.46 + ₹2,031.82 | **₹7,129.28** |
+| **Total Refunds** | Sum of `amount` in `RefundLogs` | ₹4,598.46 + ₹1,532.82 | **₹6,131.28** |
+| **Vendor Payouts** | Sum of completed payouts | From transaction history | **₹600.00** |
+| **Admin Balance** | Gross Revenue - Refunds - Payouts | ₹7,129.28 - ₹6,131.28 - ₹600.00 | **₹398.00** |
+
+### 3. Vendor Wallet Verification (Vendor Perspective)
+
+| Transaction | Type | Amount | Running Balance (Approx) |
+| :--- | :--- | :--- | :--- |
+| Item Sold (#a1c6dfc9) | Credit | +₹3,702.15 | ₹3,702.15 |
+| Item Sold (#725a6aff) | Credit | +₹1,234.05 | ₹4,936.20 |
+| Payout Request | Debit | -₹600.00 | ₹4,336.20 |
+| Refund Deduction (#a1c6dfc9) | Debit | -₹3,702.15 | ₹634.05 |
+| Refund Deduction (#725a6aff) | Debit | -₹1,234.05 | **-₹600.00** |
+
+> **Result:** The vendor balance ends at **-₹600.00** because they withdrew ₹600 before the refunds were processed, leaving them in debt to the platform.

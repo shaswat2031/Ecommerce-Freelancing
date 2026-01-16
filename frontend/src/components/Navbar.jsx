@@ -141,9 +141,9 @@ const Navbar = () => {
                                             { label: 'Certifications', path: '/certifications' },
                                         ]
                                     },
-                                    { label: 'B2B', path: '/b2b' },
                                     { label: 'Blog', path: '/blog' },
-                                    { label: 'Contact', path: '/contact' }
+                                    { label: 'Contact', path: '/contact' },
+                                    { label: 'Vendor', path: '/vendor' }
                                 ].map((item) => (
                                     item.children ? (
                                         <div key={item.label} className="relative group">

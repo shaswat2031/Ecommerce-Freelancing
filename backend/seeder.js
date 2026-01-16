@@ -1,74 +1,49 @@
-const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const products = require('./data/products');
-const User = require('./models/User');
-const Product = require('./models/Product');
-const Order = require('./models/Order');
-const Coupon = require('./models/Coupon');
-const connectDB = require('./config/db');
 const bcrypt = require('bcryptjs');
+
+const User = require('./models/User');
+const connectDB = require('./config/db');
 
 dotenv.config();
 
-connectDB();
-
-const importData = async () => {
+const seedAdmin = async () => {
     try {
-        await Order.deleteMany();
-        await Product.deleteMany();
+        // 🔑 WAIT for DB connection
+        await connectDB();
+
         await User.deleteMany();
-        await Coupon.deleteMany();
 
-        // Create Users
-        const salt = await bcrypt.genSalt(10);
-        const hash = async (pwd) => await bcrypt.hash(pwd, salt);
+        const hashedPassword = await bcrypt.hash('admin123', 10);
 
-        // We MUST create an admin user to be able to access the system
         const adminUser = await User.create({
             name: 'Admin User',
-            email: 'admin@example.com',
-            password: await hash('admin123'),
-            isAdmin: true
-        });
-        console.log(`Created Admin: ${adminUser.email}`);
-
-        // Mock Normal User REMOVED as requested
-        // Mock Coupons REMOVED as requested
-
-        console.log('Users Imported!');
-
-        // Create Products
-        const sampleProducts = products.map(product => {
-            return { ...product };
+            email: 'admin@prasadshaswat.com',
+            password: hashedPassword,
+            isAdmin: true,
         });
 
-        await Product.insertMany(sampleProducts);
-
-        console.log('Products Imported!');
+        console.log(`✅ Admin created: ${adminUser.email}`);
         process.exit();
     } catch (error) {
-        console.error(`${error}`);
+        console.error('❌ Error seeding admin:', error);
         process.exit(1);
     }
 };
 
-const destroyData = async () => {
+const destroyAdmin = async () => {
     try {
-        await Order.deleteMany();
-        await Product.deleteMany();
+        await connectDB();
         await User.deleteMany();
-        await Coupon.deleteMany();
-
-        console.log('Data Destroyed!');
+        console.log('🧹 All users removed');
         process.exit();
     } catch (error) {
-        console.error(`${error}`);
+        console.error('❌ Error destroying users:', error);
         process.exit(1);
     }
 };
 
 if (process.argv[2] === '-d') {
-    destroyData();
+    destroyAdmin();
 } else {
-    importData();
+    seedAdmin();
 }

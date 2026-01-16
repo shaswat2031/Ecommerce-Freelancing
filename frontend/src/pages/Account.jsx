@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-    LayoutDashboard, User, Package, MapPin,
-    Heart, Settings, HelpCircle, LogOut, CheckCircle, Clock,
-    Lock, Mail, Truck, PackageCheck, Phone, Star, X, CreditCard, ChevronDown, Filter, Search
+    Lock, Mail, Truck, PackageCheck, Phone, Star, X, CreditCard, ChevronDown, Filter, Search, Eye, EyeOff, Wallet, LayoutDashboard,
+    User, Heart, Package, MapPin, Settings, HelpCircle, LogOut, CheckCircle, Clock, History, Ban
 } from 'lucide-react';
 import client from '../api/client';
 import { Link, useNavigate } from 'react-router-dom';
@@ -65,6 +64,15 @@ const Account = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [searchQuery, setSearchQuery] = useState('');
     const [sortOrder, setSortOrder] = useState('newest'); // newest, oldest, price-high, price-low
+    const [refundLogs, setRefundLogs] = useState([]);
+
+    useEffect(() => {
+        if (activeTab === 'refunds') {
+            client.get('/refunds/my-logs')
+                .then(res => setRefundLogs(res.data))
+                .catch(err => console.error(err));
+        }
+    }, [activeTab]);
 
     // Redirect admin users to admin dashboard
     useEffect(() => {
@@ -165,6 +173,76 @@ const Account = () => {
         gender: 'Male'
     });
 
+
+
+    // Return Modal State
+    const [returnModalOpen, setReturnModalOpen] = useState(false);
+    const [selectedOrderForReturn, setSelectedOrderForReturn] = useState(null);
+    const [returnReason, setReturnReason] = useState('');
+    const [isSubmittingReturn, setIsSubmittingReturn] = useState(false);
+
+    const handleOpenReturnModal = (orderId) => {
+        setSelectedOrderForReturn(orderId);
+        setReturnReason('');
+        setReturnModalOpen(true);
+    };
+
+    const handleReturnSubmit = async (e) => {
+        e.preventDefault();
+        if (!selectedOrderForReturn) return;
+
+        setIsSubmittingReturn(true);
+        try {
+            await client.post(`/orders/${selectedOrderForReturn}/return`, {
+                reason: returnReason
+            });
+            alert('Return requested successfully!');
+            setReturnModalOpen(false);
+            window.location.reload();
+        } catch (error) {
+            console.error(error);
+            alert(error.response?.data?.message || 'Failed to request return');
+        } finally {
+            setIsSubmittingReturn(false);
+        }
+    };
+
+    const handleCancelOrder = async (orderId) => {
+        if (!window.confirm("Are you sure you want to cancel this order? Only product price + tax will be refunded. Delivery charges are non-refundable.")) return;
+
+        try {
+            await client.post(`/orders/${orderId}/cancel`);
+            alert("Order cancelled successfully");
+            window.location.reload();
+        } catch (error) {
+            console.error("Cancellation Failed", error);
+            alert(error.response?.data?.message || "Failed to cancel order");
+        }
+    };
+
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+
+    // Notification Preferences State
+    const [notifications, setNotifications] = useState({
+        orderUpdates: true,
+        promotions: false
+    });
+
+    const handleDeleteAccount = async () => {
+        const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+        if (confirmDelete) {
+            try {
+                await client.delete('/auth/profile');
+                logout();
+                alert("Your account has been successfully deleted.");
+            } catch (error) {
+                console.error("Failed to delete account:", error);
+                alert(error.response?.data?.message || "Failed to delete account. Please try again.");
+            }
+        }
+    };
+
     useEffect(() => {
         if (user) {
             setProfileForm({
@@ -175,8 +253,25 @@ const Account = () => {
                 dob: userProfile?.dob || '',
                 gender: userProfile?.gender || 'Male'
             });
+
+            if (user.notificationPreferences) {
+                setNotifications(user.notificationPreferences);
+            }
         }
     }, [user]);
+
+    const handleNotificationToggle = async (key) => {
+        const updatedNotifications = { ...notifications, [key]: !notifications[key] };
+        setNotifications(updatedNotifications);
+
+        try {
+            await updateProfile({ notificationPreferences: updatedNotifications });
+        } catch (error) {
+            console.error("Failed to update notification preferences", error);
+            // Revert on failure
+            setNotifications(notifications);
+        }
+    };
 
     const handleProfileUpdate = async () => {
         setIsUpdatingProfile(true);
@@ -397,6 +492,8 @@ const Account = () => {
                                 <MenuButton id="profile" icon={User} label="My Profile" />
                                 <MenuButton id="orders" icon={Package} label="My Orders" />
                                 <MenuButton id="addresses" icon={MapPin} label="Addresses" />
+                                <MenuButton id="wallet" icon={Wallet} label="Wallet" />
+                                <MenuButton id="refunds" icon={History} label="Refund History" />
                                 <MenuButton id="wishlist" icon={Heart} label="Wishlist" />
                                 <MenuButton id="settings" icon={Settings} label="Settings" />
                                 <MenuButton id="support" icon={HelpCircle} label="Support" />
@@ -456,7 +553,9 @@ const Account = () => {
                                             <div>
                                                 <p className="text-text-secondary text-xs uppercase tracking-wider font-medium">Total Spent</p>
                                                 <h3 className="text-3xl font-bold text-primary mt-2">
-                                                    {formatPrice(orders.reduce((sum, o) => sum + (o.totalPrice || 0), 0))}
+                                                    {formatPrice(orders
+                                                        .filter(o => !['Cancelled', 'Returned'].includes(o.status))
+                                                        .reduce((sum, o) => sum + (o.totalPrice || 0), 0))}
                                                 </h3>
                                             </div>
                                             <CreditCard className="text-secondary/20" size={32} />
@@ -693,6 +792,27 @@ const Account = () => {
                                                                 <Link to={`/track-order?orderId=${order._id}`} className="bg-white border border-secondary/20 hover:bg-secondary/5 text-primary text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-sm transition-colors shadow-sm hidden md:block">
                                                                     Track Order
                                                                 </Link>
+                                                                {!['Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned'].includes(order.status) && (
+                                                                    <button
+                                                                        onClick={() => handleCancelOrder(order._id)}
+                                                                        className="bg-red-50 border border-red-200 hover:bg-red-100 text-red-700 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-sm transition-colors shadow-sm ml-2"
+                                                                    >
+                                                                        Cancel
+                                                                    </button>
+                                                                )}
+                                                                {(order.status === 'Delivered' || order.status === 'delivered') && (!order.returnStatus || order.returnStatus === 'None') && (
+                                                                    <button
+                                                                        onClick={() => handleOpenReturnModal(order._id)}
+                                                                        className="bg-red-50 border border-red-200 hover:bg-red-100 text-red-700 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-sm transition-colors shadow-sm ml-2"
+                                                                    >
+                                                                        Return
+                                                                    </button>
+                                                                )}
+                                                                {order.returnStatus && order.returnStatus !== 'None' && (
+                                                                    <span className="bg-orange-50 text-orange-700 border border-orange-200 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-sm ml-2">
+                                                                        Return: {order.returnStatus}
+                                                                    </span>
+                                                                )}
                                                             </div>
                                                         </div>
 
@@ -898,6 +1018,94 @@ const Account = () => {
                             </div>
                         )}
 
+                        {/* Wallet View */}
+                        {activeTab === 'wallet' && (
+                            <div className="p-6 md:p-8 space-y-8 animate-fade-in">
+                                <div className="border-b border-secondary/10 pb-6">
+                                    <h2 className="font-heading text-3xl text-primary font-bold">My Wallet</h2>
+                                    <p className="text-text-secondary text-sm font-light mt-1">Manage your refunds and wallet balance.</p>
+                                </div>
+
+                                <div className="bg-primary text-white p-8 rounded-sm shadow-lg max-w-md relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                                    <div className="relative z-10">
+                                        <p className="text-accent text-xs font-bold uppercase tracking-widest mb-1">Available Balance</p>
+                                        <h3 className="text-4xl font-bold font-heading">{formatPrice(user.walletBalance || 0)}</h3>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 className="font-heading text-xl font-bold text-primary mb-4">Transaction History</h3>
+                                    {user.walletTransactions && user.walletTransactions.length > 0 ? (
+                                        <div className="space-y-4">
+                                            {[...user.walletTransactions].reverse().map((txn, idx) => (
+                                                <div key={idx} className="flex justify-between items-center bg-background border border-secondary/10 p-4 rounded-sm">
+                                                    <div>
+                                                        <p className="font-bold text-primary text-sm">{txn.description}</p>
+                                                        <span className="text-xs text-text-secondary">{new Date(txn.date).toLocaleDateString()}</span>
+                                                    </div>
+                                                    <div className={`font-bold ${txn.type === 'refund' || txn.type === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
+                                                        {txn.type === 'refund' || txn.type === 'credit' ? '+' : '-'}{formatPrice(txn.amount)}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-8 bg-secondary/5 rounded-sm border border-dashed border-secondary/20">
+                                            <p className="text-text-secondary text-sm">No transactions yet.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Refund History View */}
+                        {activeTab === 'refunds' && (
+                            <div className="p-6 md:p-8 space-y-8 animate-fade-in">
+                                <div className="border-b border-secondary/10 pb-6">
+                                    <h2 className="font-heading text-3xl text-primary font-bold">Refund History</h2>
+                                    <p className="text-text-secondary text-sm font-light mt-1">Track your returned items and refund status. Delivery charges are non-refundable.</p>
+                                </div>
+
+                                {refundLogs.length > 0 ? (
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead>
+                                                <tr className="border-b border-secondary/10 text-xs font-bold uppercase text-text-secondary tracking-wider">
+                                                    <th className="p-4">Order ID</th>
+                                                    <th className="p-4">Date</th>
+                                                    <th className="p-4">Refund Amount</th>
+                                                    <th className="p-4 text-red-500">Delivery Deducted</th>
+                                                    <th className="p-4">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="text-sm">
+                                                {refundLogs.map(log => (
+                                                    <tr key={log._id} className="border-b border-secondary/5 hover:bg-secondary/5 transition-colors">
+                                                        <td className="p-4 font-bold text-primary">#{log.order?._id?.slice(-8).toUpperCase()}</td>
+                                                        <td className="p-4 text-text-secondary">{new Date(log.createdAt).toLocaleDateString()}</td>
+                                                        <td className="p-4 font-bold text-green-600">+{formatPrice(log.amount)}</td>
+                                                        <td className="p-4 text-red-500 font-medium">-{formatPrice(log.deliveryCharge)}</td>
+                                                        <td className="p-4">
+                                                            <span className={`px-2 py-1 rounded-sm text-[10px] uppercase font-bold tracking-wider ${log.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                                                                }`}>
+                                                                {log.status}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-12 rounded-sm bg-secondary/5 border border-dashed border-secondary/20">
+                                        <History size={32} className="mx-auto text-secondary/40 mb-3" />
+                                        <p className="text-text-secondary text-sm">No refund records found (last 45 days).</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         {/* 5. Wishlist View */}
                         {activeTab === 'wishlist' && (
                             <div className="p-6 md:p-8 space-y-8 animate-fade-in">
@@ -940,7 +1148,12 @@ const Account = () => {
                                                     <p className="text-xs text-text-secondary">Receive updates about your order status.</p>
                                                 </div>
                                                 <label className="relative inline-flex items-center cursor-pointer">
-                                                    <input type="checkbox" defaultChecked className="sr-only peer" />
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={notifications.orderUpdates}
+                                                        onChange={() => handleNotificationToggle('orderUpdates')}
+                                                        className="sr-only peer"
+                                                    />
                                                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                                                 </label>
                                             </div>
@@ -950,7 +1163,12 @@ const Account = () => {
                                                     <p className="text-xs text-text-secondary">Receive emails about new products and sales.</p>
                                                 </div>
                                                 <label className="relative inline-flex items-center cursor-pointer">
-                                                    <input type="checkbox" className="sr-only peer" />
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={notifications.promotions}
+                                                        onChange={() => handleNotificationToggle('promotions')}
+                                                        className="sr-only peer"
+                                                    />
                                                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                                                 </label>
                                             </div>
@@ -966,11 +1184,37 @@ const Account = () => {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="space-y-2">
                                                     <label className="text-xs uppercase text-text-secondary tracking-wider font-bold">Current Password</label>
-                                                    <input type="password" className="w-full border border-secondary/20 bg-surface px-4 py-2 rounded-sm focus:outline-none focus:border-accent text-sm" placeholder="••••••••" />
+                                                    <div className="relative">
+                                                        <input
+                                                            type={showCurrentPassword ? "text" : "password"}
+                                                            className="w-full border border-secondary/20 bg-surface px-4 py-2 rounded-sm focus:outline-none focus:border-accent text-sm pr-10"
+                                                            placeholder="••••••••"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors"
+                                                        >
+                                                            {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                                        </button>
+                                                    </div>
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label className="text-xs uppercase text-text-secondary tracking-wider font-bold">New Password</label>
-                                                    <input type="password" className="w-full border border-secondary/20 bg-surface px-4 py-2 rounded-sm focus:outline-none focus:border-accent text-sm" placeholder="••••••••" />
+                                                    <div className="relative">
+                                                        <input
+                                                            type={showNewPassword ? "text" : "password"}
+                                                            className="w-full border border-secondary/20 bg-surface px-4 py-2 rounded-sm focus:outline-none focus:border-accent text-sm pr-10"
+                                                            placeholder="••••••••"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setShowNewPassword(!showNewPassword)}
+                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors"
+                                                        >
+                                                            {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="pt-2">
@@ -983,7 +1227,10 @@ const Account = () => {
 
                                     {/* Delete Account */}
                                     <div className="pt-6 border-t border-secondary/10">
-                                        <button className="text-red-600 text-sm font-bold flex items-center gap-2 hover:text-red-700 transition-colors">
+                                        <button
+                                            onClick={handleDeleteAccount}
+                                            className="text-red-600 text-sm font-bold flex items-center gap-2 hover:text-red-700 transition-colors"
+                                        >
                                             <LogOut size={16} /> Delete My Account
                                         </button>
                                         <p className="text-xs text-text-secondary mt-1">This action cannot be undone.</p>
@@ -1109,6 +1356,52 @@ const Account = () => {
                     </div>
                 )
             }
+            {/* Return Request Modal */}
+            {returnModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+                    <div className="bg-white rounded-sm shadow-xl w-full max-w-md overflow-hidden relative">
+                        <button
+                            onClick={() => setReturnModalOpen(false)}
+                            className="absolute top-4 right-4 text-text-secondary hover:text-primary transition-colors"
+                        >
+                            <X size={24} />
+                        </button>
+                        <div className="p-6">
+                            <h3 className="text-xl font-heading font-bold text-primary mb-2">Request Return</h3>
+                            <p className="text-text-secondary text-sm mb-6">Please tell us why you want to return this order. Note: Delivery charges are non-refundable.</p>
+                            <form onSubmit={handleReturnSubmit} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-text-secondary mb-2">Reason</label>
+                                    <textarea
+                                        required
+                                        rows="4"
+                                        value={returnReason}
+                                        onChange={(e) => setReturnReason(e.target.value)}
+                                        placeholder="Reason for return..."
+                                        className="w-full bg-surface border border-secondary/20 rounded-sm p-3 focus:border-accent outline-none"
+                                    ></textarea>
+                                </div>
+                                <div className="flex justify-end gap-3 pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setReturnModalOpen(false)}
+                                        className="px-4 py-2 text-sm font-bold text-text-secondary hover:text-primary transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmittingReturn}
+                                        className="bg-primary text-white px-6 py-2 rounded-sm text-sm font-bold hover:bg-accent transition-colors disabled:opacity-50"
+                                    >
+                                        {isSubmittingReturn ? 'Submitting...' : 'Confirm Return'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 };

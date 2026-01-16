@@ -14,6 +14,10 @@ const userSchema = mongoose.Schema({
         state: String,
         isDefault: { type: Boolean, default: false }
     }],
+    notificationPreferences: {
+        orderUpdates: { type: Boolean, default: true },
+        promotions: { type: Boolean, default: false }
+    },
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
     cart: [{
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
@@ -23,7 +27,14 @@ const userSchema = mongoose.Schema({
         quantity: { type: Number, default: 1 }
     }],
     resetPasswordToken: String,
-    resetPasswordExpire: Date
+    resetPasswordExpire: Date,
+    walletBalance: { type: Number, default: 0 },
+    walletTransactions: [{
+        type: { type: String, enum: ['refund', 'credit', 'debit'] },
+        amount: Number,
+        description: String,
+        date: { type: Date, default: Date.now }
+    }]
 }, {
     timestamps: true
 });

@@ -69,12 +69,12 @@ const About = () => {
                         {/* Image Block with Artistic Borders */}
                         <div className="w-full md:w-1/2 relative order-1 md:order-2 group">
                             <div className="absolute -inset-4 border border-secondary/20 translate-x-4 translate-y-4 transition-transform duration-500 group-hover:translate-x-2 group-hover:translate-y-2"></div>
-                            <div className="relative aspect-[3/4] overflow-hidden shadow-2xl">
+                            <div className="relative aspect-[4/3] max-w-lg mx-auto overflow-hidden shadow-2xl">
                                 <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-500 z-10 mx-auto"></div>
                                 <img
                                     src={BgImage2}
                                     alt="Founder Vision"
-                                    className="w-full h-full object-cover transform scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out grayscale hover:grayscale-0"
+                                    className="w-full h-full object-cover object-top transform scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out grayscale hover:grayscale-0"
                                 />
                             </div>
                             <div className="absolute -bottom-8 -left-8 bg-surface p-8 shadow-xl max-w-xs z-20 hidden lg:block">

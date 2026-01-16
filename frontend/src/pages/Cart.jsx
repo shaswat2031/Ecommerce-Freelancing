@@ -111,7 +111,8 @@ const Cart = () => {
     }
 
     const currentTotal = getCartTotal();
-    const finalTotal = Math.max(0, currentTotal - discount.amount);
+    const shippingPrice = 499;
+    const finalTotal = Math.max(0, currentTotal - discount.amount) + shippingPrice;
 
     return (
         <div className="min-h-screen bg-background pt-32 pb-16">
@@ -203,7 +204,7 @@ const Cart = () => {
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Shipping</span>
-                                    <span className="text-primary">Free</span>
+                                    <span className="text-primary">{formatPrice(499)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Tax (Included)</span>
@@ -269,7 +270,15 @@ const Cart = () => {
                             </div>
 
                             <div className="border-t border-secondary/10 pt-6 mb-8">
-                                <div className="flex justify-between items-center">
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="text-text-secondary">Subtotal</span>
+                                    <span className="font-bold text-primary">{formatPrice(currentTotal)}</span>
+                                </div>
+                                <div className="flex justify-between items-center mb-4">
+                                    <span className="text-text-secondary">Shipping</span>
+                                    <span className="font-bold text-primary">{formatPrice(shippingPrice)}</span>
+                                </div>
+                                <div className="flex justify-between items-center border-t border-secondary/10 pt-4">
                                     <span className="font-heading text-xl font-bold text-primary">Total</span>
                                     <span className="font-heading text-2xl font-bold text-accent">{formatPrice(finalTotal)}</span>
                                 </div>

@@ -26,6 +26,7 @@
     "multer-gridfs-storage": "^5.0.2",
     "nodemailer": "^7.0.12",
     "puppeteer": "^24.34.0",
+    "razorpay": "^2.9.6",
     "serverless-http": "^4.0.0",
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3"
