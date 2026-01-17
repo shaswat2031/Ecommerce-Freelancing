@@ -77,11 +77,11 @@ const About = () => {
                                     className="w-full h-full object-cover object-center transform scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out grayscale hover:grayscale-0"
                                 />
                             </div>
-                            <div className="absolute -bottom-6 -right-6 bg-surface p-6 shadow-xl max-w-xs z-20 hidden lg:block text-center border border-secondary/10">
-                                <p className="font-heading text-xl font-bold text-primary">Rajesh Thakur</p>
-                                <p className="text-[10px] text-accent uppercase tracking-[0.2em] mt-1 font-bold">Founder & CEO</p>
-                                <div className="mt-2 transform -rotate-2">
-                                    <p className="text-4xl text-blue-600 opacity-90" style={{ fontFamily: '"Great Vibes", cursive' }}>Rajesh Thakur</p>
+                            <div className="absolute -bottom-4 -right-4 bg-surface p-4 shadow-xl max-w-xs z-20 block text-center border border-secondary/10">
+                                <p className="font-heading text-lg font-bold text-primary">Rajesh Thakur</p>
+                                <p className="text-[10px] text-accent uppercase tracking-[0.2em] mt-0.5 font-bold">Founder & CEO</p>
+                                <div className="mt-1 transform -rotate-2">
+                                    <p className="text-3xl text-blue-600 opacity-90" style={{ fontFamily: '"Great Vibes", cursive' }}>Rajesh Thakur</p>
                                 </div>
                             </div>
                         </div>
