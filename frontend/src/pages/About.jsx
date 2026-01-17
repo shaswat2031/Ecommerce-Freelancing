@@ -58,7 +58,7 @@ const About = () => {
                                     <strong className="text-primary font-bold">Siraba Organic</strong> was born from a singular, powerful realization: in a world flooding with "organic" labels, authentic trust was the rarest ingredient of all.
                                 </p>
                                 <p>
-                                    Founded by <strong className="text-primary">Rajesh Thakur</strong>, a visionary entrepreneur dedicated to building global-grade brands, Siraba isn't just a business—it's a bridge. A bridge connecting India’s finest ancient agricultural heritage with the rigorous validation of modern German laboratories.
+                                    Founded by <strong className="text-primary">Rajesh Thakur</strong>, a visionary entrepreneur dedicated to building global-grade brands, Siraba isn't just a business—it's a bridge. A bridge connecting India’s finest ancient agricultural heritage with the rigorous validation of modern advanced laboratories.
                                 </p>
                                 <blockquote className="border-l-4 border-accent pl-6 py-2 my-8 text-primary font-heading text-2xl italic">
                                     "We don't sell products. We deliver verified truth."
@@ -69,18 +69,20 @@ const About = () => {
                         {/* Image Block with Artistic Borders */}
                         <div className="w-full md:w-1/2 relative order-1 md:order-2 group">
                             <div className="absolute -inset-4 border border-secondary/20 translate-x-4 translate-y-4 transition-transform duration-500 group-hover:translate-x-2 group-hover:translate-y-2"></div>
-                            <div className="relative aspect-[4/3] max-w-lg mx-auto overflow-hidden shadow-2xl">
+                            <div className="relative aspect-[3/4] max-w-md mx-auto overflow-hidden shadow-2xl">
                                 <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-500 z-10 mx-auto"></div>
                                 <img
                                     src={BgImage2}
                                     alt="Founder Vision"
-                                    className="w-full h-full object-cover object-top transform scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out grayscale hover:grayscale-0"
+                                    className="w-full h-full object-cover object-center transform scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out grayscale hover:grayscale-0"
                                 />
                             </div>
-                            <div className="absolute -bottom-8 -left-8 bg-surface p-8 shadow-xl max-w-xs z-20 hidden lg:block">
+                            <div className="absolute -bottom-6 -right-6 bg-surface p-6 shadow-xl max-w-xs z-20 hidden lg:block text-center border border-secondary/10">
                                 <p className="font-heading text-xl font-bold text-primary">Rajesh Thakur</p>
-                                <p className="text-sm text-accent uppercase tracking-wider mt-1">Founder & CEO</p>
-                                <p className="text-4xl text-blue-700 mt-4 transform -rotate-6 opacity-90" style={{ fontFamily: '"Great Vibes", cursive' }}>Rajesh Thakur</p>
+                                <p className="text-[10px] text-accent uppercase tracking-[0.2em] mt-1 font-bold">Founder & CEO</p>
+                                <div className="mt-2 transform -rotate-2">
+                                    <p className="text-4xl text-blue-600 opacity-90" style={{ fontFamily: '"Great Vibes", cursive' }}>Rajesh Thakur</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -110,50 +112,77 @@ const About = () => {
                 </div>
             </div>
 
-            {/* The Pillars (SI-RA-BA) - Specialized Grid */}
-            <section className="py-24 md:py-32 bg-secondary/5 relative">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20 space-y-4">
-                        <span className="text-accent text-sm tracking-[0.2em] uppercase font-bold">The Ethos</span>
-                        <h2 className="font-heading text-4xl md:text-5xl text-primary font-bold">The Meaning of Siraba</h2>
-                        <div className="w-24 h-1 bg-accent mx-auto mt-6"></div>
+            {/* The Pillars (SI-RA-BA) - Redesigned */}
+            <section className="py-24 md:py-32 bg-background relative overflow-hidden">
+                {/* Decorative Background Elements */}
+                <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none">
+                    <div className="absolute top-20 -left-20 w-96 h-96 bg-accent/20 rounded-full blur-3xl mix-blend-multiply"></div>
+                    <div className="absolute bottom-20 -right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl mix-blend-multiply"></div>
+                </div>
+
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div className="text-center mb-24 space-y-4">
+                        <span className="text-accent text-sm tracking-[0.3em] uppercase font-bold flex items-center justify-center gap-3">
+                            <span className="w-8 h-[1px] bg-accent/50"></span> The Ethos <span className="w-8 h-[1px] bg-accent/50"></span>
+                        </span>
+                        <h2 className="font-heading text-5xl md:text-7xl text-primary font-bold tracking-tight">
+                            The Meaning of <span className="italic font-serif text-accent">Siraba</span>
+                        </h2>
+                        <p className="max-w-2xl mx-auto text-text-secondary font-light text-lg pt-4">
+                            Rooted in ancient wisdom, defined by modern integrity.
+                        </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
                         {/* SI */}
-                        <div className="group bg-surface p-10 hover:bg-primary transition-colors duration-500 shadow-md hover:shadow-2xl border-t-2 border-accent relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-5 transition-opacity">
-                                <Feather size={120} />
+                        <div className="group relative bg-surface p-10 rounded-sm border border-secondary/10 hover:border-accent/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
+                            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity duration-500 transform group-hover:scale-110">
+                                <Feather size={140} />
                             </div>
-                            <h3 className="text-6xl font-heading font-bold text-accent/40 mb-2 group-hover:text-accent/60">SI</h3>
-                            <h4 className="text-2xl font-bold text-primary mb-4 group-hover:text-white">Sita <span className="text-sm font-normal text-text-secondary group-hover:text-white/60 ml-2 uppercase tracking-wider">// Purity</span></h4>
-                            <p className="text-text-secondary group-hover:text-white/80 leading-relaxed transition-colors duration-300">
-                                Uncompromised quality resembling the purest elements of nature. We strip away the unnecessary to reveal the essential.
-                            </p>
+                            <div className="relative z-10">
+                                <span className="block text-8xl font-heading font-black text-transparent bg-clip-text bg-gradient-to-br from-primary/10 to-primary/5 group-hover:from-accent group-hover:to-accent/60 transition-all duration-500 mb-6">SI</span>
+                                <h4 className="text-3xl font-heading font-bold text-primary mb-3 flex items-baseline gap-3">
+                                    Sita <span className="text-xs font-sans font-bold text-accent uppercase tracking-[0.2em] border border-accent/30 px-2 py-1 rounded-sm">Purity</span>
+                                </h4>
+                                <div className="w-12 h-0.5 bg-accent/30 mb-6 group-hover:w-full transition-all duration-700"></div>
+                                <p className="text-text-secondary leading-relaxed font-light">
+                                    Uncompromised quality resembling the purest elements of nature. We strip away the unnecessary to reveal the essential.
+                                </p>
+                            </div>
                         </div>
 
                         {/* RA */}
-                        <div className="group bg-surface p-10 hover:bg-primary transition-colors duration-500 shadow-md hover:shadow-2xl border-t-2 border-primary relative overflow-hidden transform md:-translate-y-8">
-                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-5 transition-opacity">
-                                <Award size={120} />
+                        <div className="group relative bg-surface p-10 rounded-sm border border-secondary/10 hover:border-accent/50 transition-all duration-500 hover:shadow-2xl md:-translate-y-12 hover:-translate-y-14">
+                            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity duration-500 transform group-hover:scale-110">
+                                <Award size={140} />
                             </div>
-                            <h3 className="text-6xl font-heading font-bold text-accent/40 mb-2 group-hover:text-accent/60">RA</h3>
-                            <h4 className="text-2xl font-bold text-primary mb-4 group-hover:text-white">Ram <span className="text-sm font-normal text-text-secondary group-hover:text-white/60 ml-2 uppercase tracking-wider">// Integrity</span></h4>
-                            <p className="text-text-secondary group-hover:text-white/80 leading-relaxed transition-colors duration-300">
-                                Honest practices, transparent sourcing, and ethical business standards. We do what is right, even when no one is watching.
-                            </p>
+                            <div className="relative z-10">
+                                <span className="block text-8xl font-heading font-black text-transparent bg-clip-text bg-gradient-to-br from-primary/10 to-primary/5 group-hover:from-accent group-hover:to-accent/60 transition-all duration-500 mb-6">RA</span>
+                                <h4 className="text-3xl font-heading font-bold text-primary mb-3 flex items-baseline gap-3">
+                                    Ram <span className="text-xs font-sans font-bold text-accent uppercase tracking-[0.2em] border border-accent/30 px-2 py-1 rounded-sm">Integrity</span>
+                                </h4>
+                                <div className="w-12 h-0.5 bg-accent/30 mb-6 group-hover:w-full transition-all duration-700"></div>
+                                <p className="text-text-secondary leading-relaxed font-light">
+                                    Honest practices, transparent sourcing, and ethical business standards. We do what is right, even when no one is watching.
+                                </p>
+                            </div>
                         </div>
 
                         {/* BA */}
-                        <div className="group bg-surface p-10 hover:bg-primary transition-colors duration-500 shadow-md hover:shadow-2xl border-t-2 border-accent relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-5 transition-opacity">
-                                <Shield size={120} />
+                        <div className="group relative bg-surface p-10 rounded-sm border border-secondary/10 hover:border-accent/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
+                            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity duration-500 transform group-hover:scale-110">
+                                <Shield size={140} />
                             </div>
-                            <h3 className="text-6xl font-heading font-bold text-accent/40 mb-2 group-hover:text-accent/60">BA</h3>
-                            <h4 className="text-2xl font-bold text-primary mb-4 group-hover:text-white">Balaji <span className="text-sm font-normal text-text-secondary group-hover:text-white/60 ml-2 uppercase tracking-wider">// Strength</span></h4>
-                            <p className="text-text-secondary group-hover:text-white/80 leading-relaxed transition-colors duration-300">
-                                The robustness of our global supply chain and the potency of our products. Reliability you can build upon.
-                            </p>
+                            <div className="relative z-10">
+                                <span className="block text-8xl font-heading font-black text-transparent bg-clip-text bg-gradient-to-br from-primary/10 to-primary/5 group-hover:from-accent group-hover:to-accent/60 transition-all duration-500 mb-6">BA</span>
+                                <h4 className="text-3xl font-heading font-bold text-primary mb-3 flex items-baseline gap-3">
+                                    Balaji <span className="text-xs font-sans font-bold text-accent uppercase tracking-[0.2em] border border-accent/30 px-2 py-1 rounded-sm">Strength</span>
+                                </h4>
+                                <div className="w-12 h-0.5 bg-accent/30 mb-6 group-hover:w-full transition-all duration-700"></div>
+                                <p className="text-text-secondary leading-relaxed font-light">
+                                    The robustness of our global supply chain and the potency of our products. Reliability you can build upon.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

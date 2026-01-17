@@ -30,7 +30,7 @@ const Home = () => {
                         loop
                         muted
                         playsInline
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover blur-[2px] scale-105"
                         poster={BgImage1}
                     >
                         <source src={HeroVideo} type="video/mp4" />
@@ -52,29 +52,29 @@ const Home = () => {
                     </p>
                     <div className="flex flex-col md:flex-row items-center justify-center gap-4 pt-6">
                         <Link
-                            to="/shop?category=Saffron"
+                            to="/shop"
                             className="bg-accent text-primary font-bold text-sm tracking-widest uppercase px-8 py-4 hover:bg-surface transition-all duration-300 transform hover:-translate-y-1 shadow-lg w-full md:w-auto"
                         >
-                            Shop Saffron
-                        </Link>
-                        <Link
-                            to="/shop?category=Hing"
-                            className="bg-primary text-surface border border-accent/50 font-bold text-sm tracking-widest uppercase px-8 py-4 hover:bg-surface hover:text-primary transition-all duration-300 transform hover:-translate-y-1 shadow-lg w-full md:w-auto"
-                        >
-                            Shop Hing
+                            Shop Products
                         </Link>
                         <Link
                             to="/b2b"
+                            className="bg-primary text-surface border border-accent/50 font-bold text-sm tracking-widest uppercase px-8 py-4 hover:bg-surface hover:text-primary transition-all duration-300 transform hover:-translate-y-1 shadow-lg w-full md:w-auto"
+                        >
+                            Order Wholesale
+                        </Link>
+                        <Link
+                            to="/vendor/intro"
                             className="bg-white/10 backdrop-blur text-surface border border-white/20 font-bold text-sm tracking-widest uppercase px-8 py-4 hover:bg-surface hover:text-primary transition-all duration-300 transform hover:-translate-y-1 shadow-lg w-full md:w-auto"
                         >
-                            Wholesale Enquiry
+                            Become Vendor
                         </Link>
                     </div>
                 </div>
             </section>
 
             {/* Trust Indicators */}
-            <section className="bg-background py-16 md:py-24 border-b border-secondary/10">
+            <section className="bg-background py-16 border-b border-secondary/10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                         <div className="flex flex-col items-center space-y-4 p-6 hover:bg-white/50 rounded-xl transition-colors duration-300">
@@ -112,7 +112,7 @@ const Home = () => {
             <TextMarquee />
 
             {/* Featured Products */}
-            <section className="py-20 md:py-32 bg-surface">
+            <section className="py-20 bg-surface">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16 space-y-4">
                         <span className="text-accent text-sm tracking-[0.2em] uppercase font-bold">Curated Excellence</span>
